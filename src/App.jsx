@@ -79,7 +79,7 @@ export default function App({ configurator = false }) {
         <p className="eyebrow">Zabudowy kamperów & części</p>
         <h1>Twój van.<br/>Twój kierunek.</h1>
         <p className="intro">Odkryj możliwości zabudowy kampera i dobierz części do swojego vana.</p>
-        <div className="hero-actions"><a className="button primary" href="/konfigurator.html">Skonfiguruj elektrykę<span className="button-icon"><Zap size={18} aria-hidden="true"/></span></a><a className="button outline" href="#realizacje">Poznaj realizacje<span className="button-icon"><Mountain size={19} aria-hidden="true"/></span></a><a className="button outline" href="#produkty">Przejdź do sklepu<span className="button-icon"><ShoppingBag size={18} aria-hidden="true"/></span></a></div>
+        <div className="hero-actions"><a className="button primary" href="/konfigurator">Skonfiguruj elektrykę<span className="button-icon"><Zap size={18} aria-hidden="true"/></span></a><a className="button outline" href="#realizacje">Poznaj realizacje<span className="button-icon"><Mountain size={19} aria-hidden="true"/></span></a><a className="button outline" href="#produkty">Przejdź do sklepu<span className="button-icon"><ShoppingBag size={18} aria-hidden="true"/></span></a></div>
       </div>
     </header>
     <main id="main">
@@ -90,7 +90,7 @@ export default function App({ configurator = false }) {
           <p className="eyebrow">Konfigurator elektryki</p>
           <h2 id="config-heading">Zaplanuj zasilanie swojego kampera</h2>
           <p>Wybierz pojazd i urządzenia. Sprawdź szacunkowe zużycie energii, dobór baterii i paneli oraz pobierz swoją konfigurację w PDF.</p>
-          <a className="button primary" href="/konfigurator.html"><Zap size={18} aria-hidden="true"/> Otwórz konfigurator</a>
+          <a className="button primary" href="/konfigurator"><Zap size={18} aria-hidden="true"/> Otwórz konfigurator</a>
         </div>
       </section>
       <section className="section wrap" id="realizacje">

@@ -307,7 +307,7 @@ function go(index) {
   const heading = panel.querySelector("h2");
   heading.tabIndex = -1;
   heading.focus({ preventScroll: true });
-  $("#main").scrollIntoView({ block: "start", behavior: reduced ? "instant" : "smooth" });
+  $("#wizard-scroll").scrollTop = 0;
 }
 
 /* ---------- zdarzenia ---------- */

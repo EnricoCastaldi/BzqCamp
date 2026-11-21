@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Konfigurator elektryki — BZQ Camp</title>
 </head>
-<body>
+<body class="config-page">
 <div id="config-chrome"></div>
 <div class="config-wrap">
   <section class="config-intro" aria-labelledby="config-title">
@@ -31,11 +31,14 @@
         <div class="wizard-status" id="step-count"></div>
         <ol id="step-progress" class="wizard-segments" aria-label="Kroki konfiguratora"></ol>
       </div>
-      <section class="panel" id="panel"></section>
+      <div class="wizard-scroll" id="wizard-scroll" tabindex="0" role="region" aria-label="Opcje konfiguracji">
+        <section class="panel" id="panel"></section>
+      </div>
     </main>
-    <aside id="aside">
+    <aside id="aside" aria-label="Podgląd instalacji">
       <div class="card sys">
-        <h2>Twój system <span id="sysTier"></span></h2>
+        <h2 id="system-title">Twój system <span id="sysTier"></span></h2>
+        <div class="system-scroll" tabindex="0" role="region" aria-labelledby="system-title">
         <svg class="diagram" id="diagram" viewBox="0 0 360 282" role="img" aria-label="Schemat instalacji elektrycznej">
         <defs><pattern id="circuit-grid" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="1" fill="#d9decf"/></pattern></defs>
         <rect width="360" height="282" rx="14" fill="url(#circuit-grid)"/>
@@ -96,6 +99,7 @@
         </div>
         <ul class="warns" id="warns"></ul>
         <p class="note">Wstępny dobór wymaga weryfikacji przez instalatora przed zakupem lub montażem. Uzysk solaru przyjęty dla Polski: lato ok. 4 h, zima ok. 0,7 h pełnego słońca dziennie.</p>
+        </div>
       </div>
     </aside>
   </div>

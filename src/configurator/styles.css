@@ -226,3 +226,28 @@ body { margin:0; padding:0; }
 
 .wizard-progress { container-type: inline-size; }
 @container (max-width: 340px) { .wizard-segments { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.config-page .grid {
+  height: max(360px, calc(100dvh - var(--site-header-height) - 30px));
+  align-items: stretch;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+}
+.config-page #main { display: flex; flex-direction: column; min-height: 0; }
+.wizard-progress { flex: 0 0 auto; }
+.wizard-scroll, .system-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.wizard-scroll { flex: 1 1 0; scrollbar-gutter: stable; }
+.config-page #aside { position: static; min-height: 0; }
+.config-page .sys { flex: 1 1 0; min-height: 0; overflow: clip; padding: 14px; }
+.system-scroll { display: flex; flex-direction: column; gap: 10px; }
+.system-scroll > * { flex: 0 0 auto; }
+.system-scroll .diagram { width: min(100%, 290px); align-self: center; }
+@media (max-width: 760px) {
+  .config-page .grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px; }
+  .config-page #aside { grid-row: 1; }
+  .config-page .sys { flex: 0 0 auto; max-height: clamp(70px, 15dvh, 120px); gap: 5px; padding: 8px 12px; }
+  .system-scroll .stats { order: -1; }
+  .system-scroll .stat .n { font-size: 1.15rem; }
+  .config-page .wizard-progress { padding-block: 8px; }
+  .config-page .wizard-segments { margin-top: 5px; row-gap: 4px; }
+}
