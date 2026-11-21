@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Konfigurator elektryki — BZQ Camp</title>
+</head>
+<body>
+<div id="config-chrome"></div>
+<div class="config-wrap">
+  <section class="config-intro" aria-labelledby="config-title">
+    <div class="showroom-copy">
+      <p class="eyebrow">Konfigurator elektryki</p>
+      <h1 id="config-title">Zasilanie na Twoich zasadach</h1>
+      <p class="lead">Dopasuj instalację do swojego kampera i pobierz propozycję w PDF.</p>
+      <a class="button primary" href="#main">Rozpocznij konfigurację</a>
+    </div>
+    <div class="showroom-vehicle">
+      <img src="/media/camper-side.webp" alt="Campervan widziany z boku" width="960" height="480">
+      <dl class="showroom-metrics">
+        <div><dt>Zużycie na dobę</dt><dd><span data-meter="energy"></span><small>Wh</small></dd></div>
+        <div><dt>Pojemność baterii</dt><dd><span data-meter="battery"></span><small>Ah</small></dd></div>
+        <div><dt>Moc paneli</dt><dd><span data-meter="solar"></span><small>Wp</small></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="grid">
+    <main class="card" id="main">
+      <div class="wizard-progress">
+        <div class="wizard-status" id="step-count"></div>
+        <ol id="step-progress" class="wizard-segments" aria-label="Kroki konfiguratora"></ol>
+      </div>
+      <section class="panel" id="panel"></section>
+    </main>
+    <aside id="aside">
+      <div class="card sys">
+        <h2>Twój system <span id="sysTier"></span></h2>
+        <svg class="diagram" id="diagram" viewBox="0 0 360 282" role="img" aria-label="Schemat instalacji elektrycznej">
+        <defs><pattern id="circuit-grid" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="1" fill="#d9decf"/></pattern></defs>
+        <rect width="360" height="282" rx="14" fill="url(#circuit-grid)"/>
+        <g data-branch="solar"><path class="circuit-wire" d="M102 46H114Q122 46 122 54V117H133"/><path class="circuit-flow" d="M102 46H114Q122 46 122 54V117H133"/></g>
+        <g data-branch="alternator"><path class="circuit-wire" d="M102 141H133"/><path class="circuit-flow" d="M102 141H133"/></g>
+        <g data-branch="shore"><path class="circuit-wire" d="M102 236H114Q122 236 122 228V165H133"/><path class="circuit-flow" d="M102 236H114Q122 236 122 228V165H133"/></g>
+        <g data-branch="dc"><path class="circuit-wire" d="M227 125H238V89H258"/><path class="circuit-flow" d="M227 125H238V89H258"/></g>
+        <g data-branch="ac"><path class="circuit-wire" d="M227 157H238V193H258"/><path class="circuit-flow" d="M227 157H238V193H258"/></g>
+        <g data-node="solar" transform="translate(8 8)">
+          <rect class="circuit-tile" width="94" height="76" rx="12"/>
+          <rect class="circuit-icon-bg" x="30" y="7" width="34" height="30" rx="8"/>
+          <g class="circuit-icon" transform="translate(36 11) scale(.92)"><path d="M4 13h16l2 7H2zM8 13l-1 7m9-7 1 7M3 16.5h18M12 2v3M5 5l2 2m12-2-2 2M9 10a3 3 0 0 1 6 0"/></g>
+          <text class="circuit-label" x="47" y="51" text-anchor="middle">Panele słoneczne</text>
+          <text class="circuit-value" x="47" y="66" text-anchor="middle" data-reading="solar"></text>
+        </g>
+        <g data-node="alternator" transform="translate(8 103)">
+          <rect class="circuit-tile" width="94" height="76" rx="12"/>
+          <rect class="circuit-icon-bg" x="30" y="7" width="34" height="30" rx="8"/>
+          <g class="circuit-icon" transform="translate(36 11) scale(.92)"><circle cx="12" cy="12" r="8"/><path d="m13 7-4 6h4l-2 4M2 12h2m16 0h2"/></g>
+          <text class="circuit-label" x="47" y="51" text-anchor="middle">Alternator</text>
+          <text class="circuit-value" x="47" y="66" text-anchor="middle" data-reading="alternator"></text>
+        </g>
+        <g data-node="shore" transform="translate(8 198)">
+          <rect class="circuit-tile" width="94" height="76" rx="12"/>
+          <rect class="circuit-icon-bg" x="30" y="7" width="34" height="30" rx="8"/>
+          <g class="circuit-icon" transform="translate(36 11) scale(.92)"><path d="M5 21h14L12 3zM9 21l3-7 3 7M10 6l2-3 2 3"/></g>
+          <text class="circuit-label" x="47" y="51" text-anchor="middle">Przyłącze 230 V</text>
+          <text class="circuit-value" x="47" y="66" text-anchor="middle" data-reading="shore"></text>
+        </g>
+        <g data-node="battery" transform="translate(133 103)">
+          <rect class="circuit-tile" width="94" height="76" rx="12"/>
+          <rect class="circuit-icon-bg" x="30" y="7" width="34" height="30" rx="8"/>
+          <g class="circuit-icon" transform="translate(36 11) scale(.92)"><rect x="2" y="6" width="18" height="12" rx="3"/><path d="M22 10v4M7 12h8m-4-4v8"/></g>
+          <text class="circuit-label" x="47" y="51" text-anchor="middle">Akumulator</text>
+          <text class="circuit-value" x="47" y="66" text-anchor="middle" data-reading="battery"></text>
+        </g>
+        <g data-node="dc" transform="translate(258 51)">
+          <rect class="circuit-tile" width="94" height="76" rx="12"/>
+          <rect class="circuit-icon-bg" x="30" y="7" width="34" height="30" rx="8"/>
+          <g class="circuit-icon" transform="translate(36 11) scale(.92)"><path d="M9 18h6m-5 4h4m-2-20a6 6 0 0 0-4 10.5c1 1 1 2 1 3.5h6c0-1.5 0-2.5 1-3.5A6 6 0 0 0 12 2z"/></g>
+          <text class="circuit-label" x="47" y="51" text-anchor="middle">Odbiorniki 12 V</text>
+          <text class="circuit-value" x="47" y="66" text-anchor="middle" data-reading="dc"></text>
+        </g>
+        <g data-node="ac" transform="translate(258 155)">
+          <rect class="circuit-tile" width="94" height="76" rx="12"/>
+          <rect class="circuit-icon-bg" x="30" y="7" width="34" height="30" rx="8"/>
+          <g class="circuit-icon" transform="translate(36 11) scale(.92)"><path d="M7 3v5m10-5v5M5 8h14v3a7 7 0 0 1-14 0zM12 18v4"/></g>
+          <text class="circuit-label" x="47" y="51" text-anchor="middle">Gniazda 230 V</text>
+          <text class="circuit-value" x="47" y="66" text-anchor="middle" data-reading="ac"></text>
+        </g>
+        </svg>
+        <div class="stats" id="stats">
+          <div class="stat"><div class="l">Zużycie na dobę</div><div class="n"><span data-meter="daily"></span> <small>Ah</small></div></div>
+          <div class="stat"><div class="l">Bateria użyteczna</div><div class="n"><span data-meter="usable"></span> <small>Ah</small></div></div>
+          <div class="stat"><div class="l">Bez kempingu, lato</div><div class="n"><span data-meter="summer"></span> <small>dni</small></div><div class="bar"><i id="summer-bar"></i></div></div>
+          <div class="stat"><div class="l">Bez kempingu, zima</div><div class="n"><span data-meter="winter"></span> <small>dni</small></div><div class="bar"><i id="winter-bar"></i></div></div>
+          <div class="stat wide"><div class="l">Kable i zabezpieczenia</div><div id="cable-totals"></div></div>
+        </div>
+        <ul class="warns" id="warns"></ul>
+        <p class="note">Wstępny dobór wymaga weryfikacji przez instalatora przed zakupem lub montażem. Uzysk solaru przyjęty dla Polski: lato ok. 4 h, zima ok. 0,7 h pełnego słońca dziennie.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div id="config-footer"></div>
+<script type="module" src="/src/configurator/entry.jsx"></script>
+</body>
+</html>

@@ -25,3 +25,9 @@ Use `npm run build` for the production output in `dist/`, and `npm run preview` 
 - `public/media/` contains the supplied logo and illustrative imagery.
 
 The product catalog, prices and compatibility are examples. The project gallery uses generated concept visuals. The cart persists in the browser. Accounts, order submission and payments require a backend. Connect the catalog module and cart UI to the eventual Node API when the production data and endpoints are available.
+
+## Electrical configurator
+
+Open `/konfigurator.html` through the hero, navigation, or homepage card. The seven-step calculator in `src/configurator/main.js` preserves the supplied configurator's options and estimates. The confirmation button generates a branded PDF in the browser, including the contact form, selected equipment, suggested components, cables, and warnings. Contact fields are included in the download and are not submitted to a server. Pricing and technical verification take place separately.
+
+The storefront and configurator share a sticky header and footer. The cable step shows a generated camper side elevation with schematic routing markers and a separate trailer outline.
