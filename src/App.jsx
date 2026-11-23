@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import HeroCounters from './components/HeroCounters';
 import TrailerPage from './components/TrailerPages';
 import { SiteHeader, SiteFooter } from './components/SiteChrome';
-import { Plus, Minus, ShoppingBag, X, Zap } from 'lucide-react';
+import { ChevronDown, Plus, Minus, ShoppingBag, X, Zap } from 'lucide-react';
 import VehicleSearch from './components/VehicleSearch';
 import Panel from './components/Panel';
 import { money, products, vehicles } from './catalog';
@@ -112,6 +112,10 @@ export default function App({ configurator = false, page }) {
         </div>
       </div>
       <HeroCounters/>
+      <a className="hero-scroll-cue" href="#realizacje">
+        <span>Odkryj renowacje</span>
+        <ChevronDown size={18} aria-hidden="true"/>
+      </a>
     </header>
     <main id="main" ref={homepage}>
       <section className="section wrap trailer-craft" id="realizacje">
@@ -122,6 +126,15 @@ export default function App({ configurator = false, page }) {
         <div className="craft-columns">
           <article data-scroll-reveal><h3>Starsze modele Niewiadów</h3><p>Zakres prac ustalamy po obejrzeniu przyczepy. Bierzemy pod uwagę jej stan i to, które elementy warto zachować.</p></article>
           <article data-scroll-reveal><h3>Praca ręczna, detal po detalu</h3><p>Renowacja często trwa wiele tygodni. Dobieramy materiały i ręcznie dopasowujemy elementy do konkretnej przyczepy.</p></article>
+        </div>
+        <div className="restoration-process">
+          <h3 data-scroll-reveal>Jak zaczynamy renowację</h3>
+          <ol>
+            <li data-scroll-reveal><h4>Zdjęcia i opis</h4><p>Podaj model przyczepy i pokaż miejsca, które wymagają naprawy.</p></li>
+            <li data-scroll-reveal><h4>Oględziny w warsztacie</h4><p>Oceniamy stan przyczepy i ustalamy, które oryginalne elementy można zachować.</p></li>
+            <li data-scroll-reveal><h4>Zakres i termin</h4><p>Po oględzinach omawiamy materiały, kolejność prac i przewidywany termin.</p></li>
+          </ol>
+          <a className="button primary" href="/renowacje.html" data-scroll-reveal>Więcej o renowacjach</a>
         </div>
       </section>
       <section className="trailer-build" id="budowa">
