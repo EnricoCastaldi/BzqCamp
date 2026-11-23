@@ -12,6 +12,15 @@ const VEH={
   przyczepa:{t:"Przyczepka",d:"np. Aster 2, przyczepa kempingowa",roofL:200,roofW:130,len:{alt:8,roof:3,inv:1,fuse:1.5,shore:2}}
 };
 
+const vehicleModels = {
+  camper: { image: "/media/camper-side.webp", proposal: "/media/camper-proposal.jpg", height: 480, alt: "Kamper widziany z boku" },
+  trailer: { image: "/media/trailer-elevation.svg", proposal: "/media/trailer-proposal.jpg", height: 420, alt: "Rysunek boczny przyczepy kempingowej" },
+};
+
+function vehicleModel() {
+  return vehicleModels[S.veh === "przyczepa" ? "trailer" : "camper"];
+}
+
 const APPS=[
  {id:"led",g:"Podstawowe",n:"Oświetlenie LED",w:4,v:12,h:4,q:6,p:["low","med","high"]},
  {id:"usb",g:"Podstawowe",n:"Gniazda USB",w:18,v:12,h:1.5,q:2,p:["low","med","high"]},
@@ -184,7 +193,12 @@ function head(t,h){return '<div><h2>'+t+'</h2><p class="hint">'+h+'</p></div>';}
 
 const VIEWS=[
  function(){return head("W czym montujemy instalację?","Od pojazdu zależą domyślne długości kabli, miejsce na panele i sposób ładowania w trakcie jazdy.")+
-  '<fieldset><legend>Pojazd</legend><div class="opts">'+Object.keys(VEH).map(k=>opt("veh",k,S.veh,VEH[k].t,VEH[k].d)).join("")+'</div></fieldset>'+
+  '<fieldset><legend>Co chcesz skonfigurować?</legend><div class="opts">'+
+  opt("vehicle-kind","camper",S.veh==="przyczepa"?"trailer":"camper","Kamper","Kamper z zabudową lub van")+
+  opt("vehicle-kind","trailer",S.veh==="przyczepa"?"trailer":"camper","Przyczepa kempingowa","Klasyczna lub nowa przyczepa")+
+  '</div></fieldset>'+
+  (S.veh==="przyczepa"?'':'<fieldset><legend>Rodzaj kampera</legend><div class="opts">'+
+  ["bus","kamper"].map(key=>opt("veh",key,S.veh,VEH[key].t,VEH[key].d)).join("")+'</div></fieldset>')+
   '<fieldset><legend>Instalacja rozruchowa pojazdu</legend><div class="opts">'+opt("starter",12,S.starter,"12V","Większość busów i kamperów")+opt("starter",24,S.starter,"24V","Ciężarówki, duże kampery")+'</div></fieldset>'+
   '<fieldset><legend>Panele na dachu</legend><div class="opts">'+opt("panel","rigid",S.panel,"Sztywne na ramie","Najwyższy uzysk, potrzebują relingów lub uchwytów")+opt("panel","flex",S.panel,"Elastyczne klejone","Niski profil, na łuki i podnoszone dachy")+opt("panel","none",S.panel,"Bez paneli","Ładowanie tylko z jazdy i kempingu")+'</div></fieldset>'+
   '<fieldset'+(S.panel==="none"?' disabled':'')+'><legend>Wolne miejsce na dachu</legend><div class="row"><div class="field"><label for="roofL">Długość</label><div><input type="number" id="roofL" min="50" max="900" step="10" value="'+S.roofL+'"> <span class="unit">cm</span></div></div><div class="field"><label for="roofW">Szerokość</label><div><input type="number" id="roofW" min="50" max="260" step="5" value="'+S.roofW+'"> <span class="unit">cm</span></div></div></div><p class="note">Licz tylko miejsce wolne od okien dachowych, wentylatora i anten. Zostawiamy 12 cm odstępu wokół paneli.</p></fieldset>';},
@@ -209,7 +223,7 @@ const VIEWS=[
   const L=S.len,R=compute();
   const items=[["alt","Akumulator rozruchowy → bateria","Wzdłuż pojazdu, od komory silnika do baterii",true],["roof","Dach → regulator solarny","Od przepustu dachowego do miejsca montażu",!!R.solar],["inv","Bateria → falownik","Im krócej, tym cieńszy kabel",!!R.inv],["fuse","Bateria → rozdzielnica 12V","Do skrzynki z bezpiecznikami odbiorników",true],["shore","Gniazdo zasilania → falownik","Od gniazda na ścianie pojazdu",!!R.inv]];
   return head("Ile kabla trzeba poprowadzić?","Podaj długości w jedną stronę. Na ich podstawie liczymy przekroje i bezpieczniki. Wartości startowe są typowe dla wybranego pojazdu.")+
-  '<div class="cables"><div class="cablelist">'+items.map((it,i)=>'<div class="cable"'+(it[3]?'':' style="opacity:.5"')+'><span class="k">'+(i+1)+'</span><label for="len-'+it[0]+'">'+it[1]+'<small>'+it[2]+(it[3]?'':' (nie dotyczy)')+'</small></label><div><input type="number" id="len-'+it[0]+'" data-len="'+it[0]+'" min="0.2" max="20" step="0.1" value="'+L[it[0]]+'"'+(it[3]?'':' disabled')+'> <span class="unit">m</span></div></div>').join("")+'</div>'+vanSvg()+'</div>';},
+  '<div class="cables"><div class="cablelist">'+items.map((it,i)=>'<div class="cable"'+(it[3]?'':' style="opacity:.5"')+'><span class="k">'+(i+1)+'</span><label for="len-'+it[0]+'">'+it[1]+'<small>'+it[2]+(it[3]?'':' (nie dotyczy)')+'</small></label><div><input type="number" id="len-'+it[0]+'" data-len="'+it[0]+'" min="0.2" max="20" step="0.1" value="'+L[it[0]]+'"'+(it[3]?'':' disabled')+'> <span class="unit">m</span></div></div>').join("")+'</div>'+cableDiagram()+'</div>';},
  function(){return head("Jaki poziom sprzętu?","Każdy poziom liczymy tą samą metodą. Różni się trwałością, gwarancją i wygodą monitorowania.")+
   '<fieldset><legend>Poziom</legend><div class="opts">'+Object.keys(TIERS).map(k=>opt("tier",k,S.tier,TIERS[k].t,TIERS[k].d)).join("")+'</div></fieldset>';},
  function(){return head("Jak chcesz to dostać?","Te same części w każdej opcji. Różni się tylko to, ile pracy zostaje po Twojej stronie.")+
@@ -217,16 +231,33 @@ const VIEWS=[
  function(){return summaryHtml();}
 ];
 
-function vanSvg(){
-  const t=S.veh;
-  const body=t==="przyczepa"?'<path d="M70 60 Q70 30 130 30 L250 30 Q300 30 300 80 L300 110 L70 110 Z" class="vb"/><line x1="20" y1="104" x2="70" y2="104" class="vb2"/><circle cx="180" cy="114" r="14" class="vw"/>':
-   '<image href="/media/camper-side.webp" x="8" y="5" width="314" height="130" preserveAspectRatio="xMidYMid meet" class="vehicle-image"/>' ;
-  const engX=t==="przyczepa"?24:288;
-  return '<svg class="vansvg" viewBox="0 0 330 150" role="img" aria-label="Rozmieszczenie kabli w pojeździe"><style>.vb{fill:var(--bg);stroke:var(--muted);stroke-width:1.5}.vb2{stroke:var(--muted);stroke-width:3}.vw{fill:var(--surface);stroke:var(--muted);stroke-width:1.5}.vc{stroke:var(--wire);stroke-width:2.5;fill:none}.vt{fill:var(--surface);font:600 11px var(--f-mono)}.vk{fill:var(--wire)}.vbat{fill:var(--accent)}.vl{fill:var(--muted);font:500 10px var(--f-body)}</style>'+body+
-   '<rect x="150" y="80" width="34" height="22" rx="3" class="vbat"/><text x="167" y="95" text-anchor="middle" class="vt">BAT</text>'+
-   '<path d="M'+engX+' 92 L184 92" class="vc"/><path d="M200 34 L200 78" class="vc"/><path d="M150 88 L118 88" class="vc"/><path d="M150 98 L110 98 L110 104" class="vc"/><path d="M60 100 L60 70 L110 70 L110 80" class="vc"/>'+
-   [[engX>150?engX-14:engX+14,92,1],[210,52,2],[130,82,3],[100,104,4],[50,82,5]].map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="8" class="vk"/><text x="'+p[0]+'" y="'+(p[1]+4)+'" text-anchor="middle" class="vt">'+p[2]+'</text>').join("")+
-   '<text x="'+(engX>150?250:30)+'" y="140" class="vl">'+(t==="przyczepa"?"gniazdo holownicze":"komora silnika")+'</text></svg>';
+function cableDiagram() {
+  const isTrailer = S.veh === "przyczepa";
+  const routes = isTrailer ? [
+    { path: "M32 103H56L78 91H151", x: 69, y: 96 },
+    { path: "M183 20V73L176 80", x: 183, y: 37 },
+    { path: "M149 84H108V70", x: 108, y: 70 },
+    { path: "M178 93H242V75", x: 242, y: 77 },
+    { path: "M288 90H266V58H242", x: 281, y: 90 },
+  ] : [
+    { path: "M288 92H178", x: 274, y: 92 },
+    { path: "M200 34V78", x: 200, y: 52 },
+    { path: "M149 88H118", x: 127, y: 88 },
+    { path: "M149 97H110V104", x: 104, y: 103 },
+    { path: "M60 100V70H110V80", x: 60, y: 78 },
+  ];
+  const source = isTrailer ? "Gniazdo holownicze" : "Komora silnika";
+  return `<svg class="vansvg" viewBox="0 0 330 156" role="img" aria-label="Poglądowe trasy kabli w wybranym pojeździe">
+    <image href="${vehicleModel().image}" x="${isTrailer ? 0 : 8}" y="${isTrailer ? 0 : 5}" width="${isTrailer ? 330 : 314}" height="${isTrailer ? 144 : 130}" class="vehicle-image"/>
+    ${routes.map(({ path, x, y }, index) => `<g>
+      <path d="${path}" class="vc"/>
+      <circle cx="${x}" cy="${y}" r="8" class="vk"/>
+      <text x="${x}" y="${y}" dy=".35em" text-anchor="middle" class="vt">${index + 1}</text>
+    </g>`).join("")}
+    <rect x="149" y="80" width="31" height="18" rx="3" class="vbat"/>
+    <text x="164.5" y="89" dy=".35em" text-anchor="middle" class="vt">BAT</text>
+    <text x="${isTrailer ? 26 : 250}" y="152" class="vl">${source}</text>
+  </svg>`;
 }
 
 function summaryHtml(){
@@ -288,7 +319,15 @@ function renderAside(){
   $("#warns").innerHTML=R.warn.map(w=>'<li class="'+(w.c==="warn"?"":w.c)+'">'+w.t+'</li>').join("");
 }
 
-function render(){renderSteps();$("#panel").innerHTML=VIEWS[S.step]()+(S.step<STEPS.length-1?navHtml():"");renderAside();}
+function render(){
+  const model = vehicleModel();
+  const preview = $("#vehicle-preview");
+  if (preview.getAttribute("src") !== model.image) {
+    preview.src = model.image;
+    preview.alt = model.alt;
+    preview.height = model.height;
+  }
+  renderSteps();$("#panel").innerHTML=VIEWS[S.step]()+(S.step<STEPS.length-1?navHtml():"");renderAside();}
 function go(index) {
   const step = Math.max(0, Math.min(STEPS.length - 1, index));
   if (step === S.step) return;
@@ -320,7 +359,13 @@ document.addEventListener("change",e=>{
   const t=e.target;if(!t.name&&!t.id)return;
   if(t.type==="radio"){
     const v=t.value;
-    if(t.name==="veh"){S.veh=v;S.roofL=VEH[v].roofL;S.roofW=VEH[v].roofW;S.len=Object.assign({},VEH[v].len);}
+    if(t.name==="veh" || t.name==="vehicle-kind"){
+      const vehicle = t.name==="veh" ? v : v==="trailer" ? "przyczepa" : "bus";
+      S.veh=vehicle;
+      S.roofL=VEH[vehicle].roofL;
+      S.roofW=VEH[vehicle].roofW;
+      S.len={...VEH[vehicle].len};
+    }
     else if(t.name==="starter")S.starter=+v;
     else if(t.name==="panel")S.panel=v;
     else if(t.name==="style")S.style=v;
@@ -368,6 +413,7 @@ document.addEventListener("submit",async e=>{
     const item=S.apps[app.id];
     return [app.n,app.v+" V",item.w+" W",fmt(item.h,2)+" h",String(item.q)];
   });
+  const proposalImage = vehicleModel().proposal;
   button.disabled=true;
   status.textContent="Przygotowywanie PDF…";
   try{
@@ -377,7 +423,7 @@ document.addEventListener("submit",async e=>{
       { label: "Pojemność baterii", value: fmt(R.cap) + " Ah" },
       { label: "Moc paneli", value: fmt(R.solar?.w ?? 0) + " Wp" },
     ];
-    await downloadProposal({contact:c,options,equipment,tables,totals,warnings:R.warn.map(item=>item.t)});
+    await downloadProposal({contact:c,options,equipment,tables,totals,proposalImage,warnings:R.warn.map(item=>item.t)});
     status.textContent="Propozycja PDF jest gotowa do pobrania.";
   }catch(error){
     console.error(error);

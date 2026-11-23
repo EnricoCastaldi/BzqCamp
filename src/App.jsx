@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import HeroCounters from './components/HeroCounters';
+import TrailerPage from './components/TrailerPages';
 import { SiteHeader, SiteFooter } from './components/SiteChrome';
-import { Plus, Minus, ShoppingBag, X, Mountain, Zap } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, X, Zap } from 'lucide-react';
 import VehicleSearch from './components/VehicleSearch';
 import Panel from './components/Panel';
-import HeroGallery from './components/HeroGallery';
-import BrandCarousel from './components/BrandCarousel';
-import { money, products, projects, vehicles } from './catalog';
+import { money, products, vehicles } from './catalog';
 
 const cartKey = 'bzq-demo-cart';
 
@@ -19,12 +19,32 @@ function loadCart() {
   }
 }
 
-export default function App({ configurator = false }) {
+export default function App({ configurator = false, page }) {
   const [cart, setCart] = useState(loadCart);
   const [panel, setPanel] = useState(null);
   const [filter, setFilter] = useState({});
   const [searchReset, setSearchReset] = useState(0);
   useEffect(() => { try { localStorage.setItem(cartKey, JSON.stringify(cart)); } catch { /* In-memory cart still works. */ } }, [cart]);
+  const homepage = useRef(null);
+
+  useEffect(() => {
+    const main = homepage.current;
+    if (!main || !('IntersectionObserver' in window)) return;
+
+    const targets = [...main.querySelectorAll('[data-scroll-reveal]')];
+    const observer = new IntersectionObserver(entries => {
+      for (const { target, isIntersecting } of entries) {
+        target.toggleAttribute('data-offscreen', !isIntersecting);
+      }
+    });
+    targets.forEach(target => observer.observe(target));
+
+    return () => {
+      observer.disconnect();
+      targets.forEach(target => target.removeAttribute('data-offscreen'));
+    };
+  }, [filter]);
+
   const cartItems = products.filter(({ id }) => cart[id]);
   const count = cartItems.reduce((sum, { id }) => sum + cart[id], 0);
   const total = cartItems.reduce((sum, { id, price }) => sum + cart[id] * price, 0);
@@ -62,7 +82,7 @@ export default function App({ configurator = false }) {
     </Panel>}
     {panel?.type === 'account' && <Panel title="Moje konto" onClose={close}><p>Logowanie i historia zamówień będą dostępne po uruchomieniu sklepu.</p><button className="button primary" onClick={close}>Wróć do sklepu</button></Panel>}
   </>;
-  const header = <SiteHeader configurator={configurator} count={count} onPanel={setPanel}/>;
+  const header = <SiteHeader configurator={configurator} page={page} count={count} onPanel={setPanel}/>;
 
   if (configurator) return <>
     {header}
@@ -70,38 +90,67 @@ export default function App({ configurator = false }) {
     {shopPanels}
   </>;
 
+  if (page) return <>
+    {header}
+    <a className="skip" href="#main">Przejdź do treści</a>
+    <TrailerPage page={page}/>
+    <SiteFooter/>
+    {shopPanels}
+  </>;
+
   return <>
     {header}
     <a className="skip" href="#main">Przejdź do treści</a>
-    <header className="hero" id="start">
-      <HeroGallery/>
+    <header className="hero trailer-hero" id="start">
       <div className="hero-copy wrap">
-        <p className="eyebrow">Zabudowy kamperów & części</p>
-        <h1>Twój van.<br/>Twój kierunek.</h1>
-        <p className="intro">Odkryj możliwości zabudowy kampera i dobierz części do swojego vana.</p>
-        <div className="hero-actions"><a className="button primary" href="/konfigurator">Skonfiguruj elektrykę<span className="button-icon"><Zap size={18} aria-hidden="true"/></span></a><a className="button outline" href="#realizacje">Poznaj realizacje<span className="button-icon"><Mountain size={19} aria-hidden="true"/></span></a><a className="button outline" href="#produkty">Przejdź do sklepu<span className="button-icon"><ShoppingBag size={18} aria-hidden="true"/></span></a></div>
+        <p className="eyebrow">Manufaktura przyczep kempingowych</p>
+        <h1><span>Przyczepy z historią.</span>{" "}<span>I te, które dopiero ją zaczynają.</span></h1>
+        <p className="intro">Ręcznie odnawiamy klasyczne przyczepy kempingowe, w szczególności starsze modele Niewiadów. <span>Budujemy też nowe przyczepy na indywidualne zamówienie.</span></p>
+        <div className="hero-actions">
+          <a className="button primary trailer-action" href="/renowacje.html">Poznaj renowacje</a>
+          <a className="button outline trailer-action" href="/kontakt.html">Porozmawiajmy o Twojej przyczepie</a>
+        </div>
       </div>
+      <HeroCounters/>
     </header>
-    <main id="main">
-      <div className="wrap finder-wrap"><VehicleSearch key={searchReset} onSearch={search}/></div>
-      <BrandCarousel/>
-      <section className="config-promo wrap" aria-labelledby="config-heading">
-        <div className="config-promo-copy">
-          <p className="eyebrow">Konfigurator elektryki</p>
-          <h2 id="config-heading">Zaplanuj zasilanie swojego kampera</h2>
-          <p>Wybierz pojazd i urządzenia. Sprawdź szacunkowe zużycie energii, dobór baterii i paneli oraz pobierz swoją konfigurację w PDF.</p>
-          <a className="button primary" href="/konfigurator"><Zap size={18} aria-hidden="true"/> Otwórz konfigurator</a>
+    <main id="main" ref={homepage}>
+      <section className="section wrap trailer-craft" id="realizacje">
+        <div className="section-head" data-scroll-reveal>
+          <div><p className="eyebrow">Renowacje</p><h2>Jeszcze wiele dróg przed nią</h2></div>
+          <p>Niektóre przyczepy są w rodzinie od czterdziestu lat. Odnawiamy je dla ludzi, którzy chcą dalej z nimi podróżować.</p>
+        </div>
+        <div className="craft-columns">
+          <article data-scroll-reveal><h3>Starsze modele Niewiadów</h3><p>Zakres prac ustalamy po obejrzeniu przyczepy. Bierzemy pod uwagę jej stan i to, które elementy warto zachować.</p></article>
+          <article data-scroll-reveal><h3>Praca ręczna, detal po detalu</h3><p>Renowacja często trwa wiele tygodni. Dobieramy materiały i ręcznie dopasowujemy elementy do konkretnej przyczepy.</p></article>
         </div>
       </section>
-      <section className="section wrap" id="realizacje">
-        <div className="section-head"><div><p className="eyebrow">Zabudowy</p><h2>Nasze realizacje</h2></div><p>Poznaj przykładowe kierunki zabudowy vana, od wnętrza po wersję wyprawową.</p></div>
-        <div className="projects">{projects.map(project => <button className="project" key={project.name} onClick={() => setPanel({ type: 'project', item: project })}><img src={project.image} alt="" loading="lazy"/><div><span>{project.tag}</span><h3>{project.name}</h3></div><span className="project-plus" aria-hidden="true"><Plus size={21}/></span></button>)}</div>
+      <section className="trailer-build" id="budowa">
+        <div className="wrap section trailer-build-copy" data-scroll-reveal>
+          <p className="eyebrow">Budowa na zamówienie</p>
+          <h2>Przyczepa dopasowana do Twoich podróży</h2>
+          <p>Rozmawiamy o tym, jak podróżujesz i czego potrzebujesz na postoju. Na tej podstawie ustalamy układ wnętrza, materiały i wyposażenie nowej przyczepy.</p>
+          <a className="button primary" href="/budowa.html">Poznaj budowę na zamówienie</a>
+        </div>
+      </section>
+      <section className="section wrap trailer-contact" id="kontakt">
+        <div data-scroll-reveal><p className="eyebrow">Kontakt</p><h2>Opowiedz nam o swojej przyczepie</h2></div>
+        <div data-scroll-reveal><p>W sprawie renowacji przygotuj model, zdjęcia przyczepy i krótki opis jej stanu. Przy budowie opowiedz nam, jak chcesz korzystać z nowej przyczepy.</p>
+          <a className="button primary" href="/kontakt.html">Przejdź do kontaktu</a></div>
+      </section>
+      <section className="config-promo wrap" aria-labelledby="config-heading">
+        <div className="config-promo-copy" data-scroll-reveal>
+          <p className="eyebrow">Instalacje do kamperów</p>
+          <h2 id="config-heading">Zaplanuj zasilanie kampera</h2>
+          <p>Dobierz instalację elektryczną do pojazdu i wyposażenia. Sprawdź szacunkowe zużycie energii i pobierz propozycję w PDF.</p>
+          <a className="button primary" href="/konfigurator.html"><Zap size={18} aria-hidden="true"/> Otwórz konfigurator</a>
+        </div>
       </section>
       <section className="shop" id="produkty">
         <div className="section wrap">
-          <div className="section-head"><div><p className="eyebrow">Sklep</p><h2>Nasze produkty</h2></div><p>Katalog demonstracyjny. Zdjęcia, ceny i dopasowanie do modeli mają charakter poglądowy.</p></div>
+          <VehicleSearch key={searchReset} onSearch={search}/>
+          <div className="section-head" data-scroll-reveal><div><p className="eyebrow">Sklep</p><h2>Nasze produkty</h2></div><p>Katalog demonstracyjny. Zdjęcia, ceny i dopasowanie do modeli mają charakter poglądowy.</p></div>
           {filter.brand && <div className="filter" aria-live="polite"><span>{filter.brand} {filter.model} · {shownProducts.length} wyników</span><button className="text-button" onClick={() => { setFilter({}); setSearchReset(value => value + 1); }}>Wyczyść filtr <X size={16}/></button></div>}
-          <div className="product-grid">{shownProducts.map(product => <article className="product" key={product.id}>
+          <div className="product-grid">{shownProducts.map(product => <article className="product" key={product.id} data-scroll-reveal>
             <button className="product-image" aria-label={`Zobacz ${product.name}`} onClick={() => setPanel({ type: 'product', item: product })}><img src={product.image} alt="" loading="lazy"/></button>
             <div className="product-info"><p>{product.category}</p><h3>{product.name}</h3><div className="price"><strong>{money.format(product.price)}</strong><button className="icon product-add" aria-label={`Dodaj do koszyka: ${product.name}`} onClick={() => add(product)}><Plus size={21}/></button></div></div>
           </article>)}</div>
@@ -112,7 +161,6 @@ export default function App({ configurator = false }) {
     <SiteFooter/>
 
     {shopPanels}
-    {panel?.type === 'project' && <Panel title={panel.item.name} onClose={close}><img className="detail-photo" src={panel.item.image} alt={panel.item.name}/><p>{panel.item.description}</p></Panel>}
     {panel?.type === 'product' && <Panel title={panel.item.name} onClose={close}><img className="detail-photo product-detail" src={panel.item.image} alt={panel.item.name}/><p>{panel.item.description}</p><p><strong>{money.format(panel.item.price)}</strong></p><button className="button primary" onClick={() => add(panel.item)}>Dodaj do koszyka</button></Panel>}
   </>;
 }

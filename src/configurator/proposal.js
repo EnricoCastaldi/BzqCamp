@@ -16,7 +16,7 @@ function table(rows, widths) {
       widths,
       body: rows.map((row, index) => row.map(text => ({
         text,
-        ...(index === 0 && { bold: true, fillColor: '#eef3d8' }),
+        ...(index === 0 && { bold: true, fillColor: '#f0e5d1' }),
       }))),
     },
     layout: 'lightHorizontalLines',
@@ -35,43 +35,43 @@ async function imageData(path) {
   });
 }
 
-export async function downloadProposal({ contact, options, equipment, tables, totals, warnings }) {
+export async function downloadProposal({ contact, options, equipment, tables, totals, proposalImage, warnings }) {
   const date = new Intl.DateTimeFormat('pl-PL', { dateStyle: 'long' }).format();
-  const [logo, camper] = await Promise.all([
+  const [logo, vehicleImage] = await Promise.all([
     imageData('/media/logo.png'),
-    imageData('/media/camper-proposal.jpg'),
+    imageData(proposalImage),
   ]);
   const document = {
     info: { title: 'Wstępna propozycja instalacji elektrycznej', author: 'BZQ Camp' },
     pageSize: 'A4',
     pageMargins: [38, 36, 38, 42],
-    defaultStyle: { fontSize: 9, color: '#22251d', lineHeight: 1.15 },
+    defaultStyle: { fontSize: 9, color: '#24211d', lineHeight: 1.15 },
     styles: { section: { fontSize: 13, bold: true, margin: [0, 15, 0, 5] } },
     footer: (page, count) => ({
       text: `BZQ Camp  /  ${page} z ${count}`,
-      alignment: 'right', margin: [38, 10, 38, 0], color: '#565b4e',
+      alignment: 'right', margin: [38, 10, 38, 0], color: '#625a4f',
     }),
     content: [
       {
         table: { widths: [66, '*'], body: [[
-          { image: logo, width: 52, fillColor: '#171a12', margin: [5, 6, 0, 5] },
+          { image: logo, width: 52, fillColor: '#1d1b19', margin: [5, 6, 0, 5] },
           { stack: [
             { text: 'Wstępna propozycja instalacji elektrycznej', fontSize: 18, bold: true, color: '#ffffff' },
-            { text: date, color: '#e5ef97', margin: [0, 5, 0, 0] },
-          ], fillColor: '#171a12', margin: [5, 6, 5, 5] },
+            { text: date, color: '#ddc69b', margin: [0, 5, 0, 0] },
+          ], fillColor: '#1d1b19', margin: [5, 6, 5, 5] },
         ]] },
         layout: 'noBorders',
       },
-      { text: disclaimer, margin: [0, 10, 0, 0], color: '#565b4e' },
-      { image: camper, fit: [460, 155], alignment: 'center', margin: [0, 12, 0, 8] },
+      { text: disclaimer, margin: [0, 10, 0, 0], color: '#625a4f' },
+      { image: vehicleImage, fit: [460, 155], alignment: 'center', margin: [0, 12, 0, 8] },
       {
         table: { widths: ['*', '*', '*'], body: [totals.map(({ label, value }) => ({
           stack: [
             { text: value, fontSize: 20, bold: true },
-            { text: label, color: '#565b4e' },
+            { text: label, color: '#625a4f' },
           ],
           margin: [9, 8, 6, 8],
-          fillColor: '#eef3d8',
+          fillColor: '#f0e5d1',
         }))] },
         layout: 'noBorders',
       },

@@ -16,7 +16,7 @@
       <a class="button primary" href="#main">Rozpocznij konfigurację</a>
     </div>
     <div class="showroom-vehicle">
-      <img src="/media/camper-side.webp" alt="Campervan widziany z boku" width="960" height="480">
+      <img id="vehicle-preview" src="/media/camper-side.webp" alt="Kamper widziany z boku" width="960" height="480">
       <dl class="showroom-metrics">
         <div><dt>Zużycie na dobę</dt><dd><span data-meter="energy"></span><small>Wh</small></dd></div>
         <div><dt>Pojemność baterii</dt><dd><span data-meter="battery"></span><small>Ah</small></dd></div>
@@ -40,7 +40,7 @@
         <h2 id="system-title">Twój system <span id="sysTier"></span></h2>
         <div class="system-scroll" tabindex="0" role="region" aria-labelledby="system-title">
         <svg class="diagram" id="diagram" viewBox="0 0 360 282" role="img" aria-label="Schemat instalacji elektrycznej">
-        <defs><pattern id="circuit-grid" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="1" fill="#d9decf"/></pattern></defs>
+        <defs><pattern id="circuit-grid" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="1" fill="#ddd1bd"/></pattern></defs>
         <rect width="360" height="282" rx="14" fill="url(#circuit-grid)"/>
         <g data-branch="solar"><path class="circuit-wire" d="M102 46H114Q122 46 122 54V117H133"/><path class="circuit-flow" d="M102 46H114Q122 46 122 54V117H133"/></g>
         <g data-branch="alternator"><path class="circuit-wire" d="M102 141H133"/><path class="circuit-flow" d="M102 141H133"/></g>

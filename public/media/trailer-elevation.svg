@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420">
+  <title>Rysunek boczny klasycznej przyczepy kempingowej</title>
+  <defs>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#ded4c2" opacity=".55"/></pattern>
+    <linearGradient id="body" x2="0" y2="1"><stop stop-color="#fffdf8"/><stop offset="1" stop-color="#eee5d4"/></linearGradient>
+  </defs>
+  <rect x="34" y="12" width="892" height="396" rx="8" fill="url(#grid)"/>
+  <g stroke="#29241e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M235 310 120 326H78m22 0v30m124-20 587 0m-75 0 43 23m-515-23-33 23" fill="none"/>
+    <path d="M197 96q17-28 72-31h457q76 0 106 54l40 153q9 31-10 55H577a62 62 0 0 0-124 0H207q-32 0-28-38z" fill="url(#body)"/>
+    <path d="M328 65l15-33h281l24 33" fill="#eee5d4"/>
+    <path d="M357 47h252" stroke="#a78b59" stroke-width="2"/>
+    <path d="M205 234h650m-660 9h663" stroke="#a78b59" stroke-width="3"/>
+    <rect x="231" y="118" width="167" height="91" rx="11" fill="#ddd7cd"/>
+    <rect x="240" y="127" width="149" height="73" rx="7" fill="#c6c1b6" stroke-width="2"/>
+    <path d="M315 127v73m-65-57 32-16m-28 33 49-26" stroke="#776f61" stroke-width="2"/>
+    <rect x="627" y="109" width="97" height="202" rx="9" fill="#f8f2e7"/>
+    <rect x="642" y="125" width="66" height="59" rx="6" fill="#cdc7bb" stroke-width="2"/>
+    <path d="M642 234h66m-61-12h11" stroke-width="2"/>
+    <path d="M756 123h38q16 0 19 15l13 53q3 10-9 10h-61q-8 0-8-8v-62q0-8 8-8z" fill="#d0cabf"/>
+    <path d="M770 131v62" stroke-width="2"/>
+    <circle cx="515" cy="326" r="52" fill="#2d2b27"/>
+    <circle cx="515" cy="326" r="28" fill="#efeadf"/>
+    <circle cx="515" cy="326" r="8" fill="#a78b59" stroke-width="2"/>
+    <path d="M515 305v5m0 32v5m-21-21h5m32 0h5" stroke-width="2"/>
+    <rect x="204" y="279" width="22" height="9" rx="2" fill="#a78b59" stroke-width="2"/>
+    <rect x="833" y="278" width="21" height="9" rx="2" fill="#a78b59" stroke-width="2"/>
+  </g>
+  <g fill="none" stroke="#987d51" stroke-width="1.5">
+    <path d="M77 374v25m793-40v40M80 393h787m-785-4-5 4 5 4m783-8 5 4-5 4M904 33h21m-32 295h32m-9-295v295m-4-291 4-4 4 4m-8 287 4 4 4-4"/>
+  </g>
+</svg>
