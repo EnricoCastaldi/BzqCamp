@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Award, SlidersHorizontal, Wrench } from 'lucide-react';
-
 const counters = [
-  { value: 30, unit: ' lat', label: 'Doświadczenia', icon: Award },
-  { value: 150, unit: '', label: 'Renowacji', icon: Wrench },
-  { value: 85, unit: '', label: 'Konfiguracji', icon: SlidersHorizontal },
+  { value: 30, unit: ' lat', label: 'Doświadczenia' },
+  { value: 150, unit: '+', label: 'Renowacji' },
+  { value: 85, unit: '+', label: 'Konfiguracji' },
+  { value: 200, unit: '+', label: 'Klientów' },
 ];
 
 export default function HeroCounters() {
@@ -46,8 +45,8 @@ export default function HeroCounters() {
   }, []);
 
   return <dl className="hero-counters wrap" data-shimmer={shimmer ? "" : undefined} ref={strip}>
-    {counters.map(({ value, unit, label, icon: Icon }) => <div key={label}>
-      <dt><Icon className="hero-counter-icon" strokeWidth={1.5} aria-hidden="true"/>{label}</dt>
+    {counters.map(({ value, unit, label }) => <div key={label}>
+      <dt>{label}</dt>
       <dd><span className="hero-counter-reading" aria-hidden="true"><span className="hero-counter-number" data-value={value}>{Math.round(value * progress)}</span><small>{unit}</small></span><span className="sr-only">{value}{unit}</span></dd>
     </div>)}
   </dl>;
