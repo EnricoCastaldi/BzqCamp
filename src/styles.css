@@ -454,3 +454,35 @@ body[data-trailer-page] .primary:hover { background: #e7d4af; }
 .restoration-process li::marker { color: #765a31; font-weight: 700; }
 .restoration-process h4 { display: inline; }
 .restoration-process p { margin-top: 6px; color: var(--muted); line-height: 1.5; }
+
+.site-header .brand { position: relative; }
+.site-header .brand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask: url('/media/logo.png') center / 100% 100% no-repeat;
+  opacity: 0;
+  background: #e4c487;
+}
+.site-header .brand:is(:hover, :focus-visible)::after { opacity: 1; }
+.site-header .brand:focus-visible { outline-color: #ddc69b; }
+@media (prefers-reduced-motion: no-preference) {
+  .site-header .brand:is(:hover, :focus-visible)::after {
+    background: linear-gradient(112deg, transparent 38%, #c39445 46%, #ffe6aa 50%, #c39445 54%, transparent 62%) right center / 300% 100%;
+    animation: hero-counter-shimmer 2.8s ease-in-out infinite;
+  }
+}
+
+.site-header .nav-links a:is(:hover, :focus-visible) { color: #e4c487; }
+.site-header .nav-links a:focus-visible { outline-color: #ddc69b; }
+@supports (background-clip: text) {
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header .nav-links a:is(:hover, :focus-visible) {
+      color: transparent;
+      background: linear-gradient(112deg, #ddc69b 38%, #c39445 46%, #ffe6aa 50%, #c39445 54%, #ddc69b 62%) right center / 300% 100%;
+      background-clip: text;
+      animation: hero-counter-shimmer 2.8s ease-in-out infinite;
+    }
+  }
+}
