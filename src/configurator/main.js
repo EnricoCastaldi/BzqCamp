@@ -1,5 +1,6 @@
 import { deviceIcon } from "./device-icons.js";
-import { updateMeters } from "./meters.js";
+import { language, locale, localize, setLanguage, t, translator } from "./language.js";
+import { updateMeters, redrawMeters } from "./meters.js";
 import "./styles.css";
 
 (function(){
@@ -79,7 +80,7 @@ function applyPreset(p){S.preset=p;S.apps={};APPS.forEach(a=>{if(a.p.indexOf(p)>
 applyPreset("med");
 
 const $=s=>document.querySelector(s);
-const fmt=(n,d)=>Number(n).toLocaleString("pl-PL",{maximumFractionDigits:d===undefined?0:d,minimumFractionDigits:0});
+const fmt=(n,d)=>Number(n).toLocaleString(locale,{maximumFractionDigits:d===undefined?0:d,minimumFractionDigits:0});
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function appAh(a,x){return x.w*x.h*x.q/12/(a.v===230?0.9:1);}
@@ -101,7 +102,7 @@ function compute(){
   // 230V
   if(any230){
     let m=INV.find(x=>x.w>=max230);
-    if(!m){m=INV[INV.length-1];R.warn.push({c:"crit",t:"Urządzenie "+fmt(max230)+" W przekracza 2400 W. W instalacji 12V tego nie zasilimy, porozmawiajmy o systemie 24V."});}
+    if(!m){m=INV[INV.length-1];R.warn.push({c:"crit",t:t("Urządzenie {0} W przekracza 2400 W. W instalacji 12V tego nie zasilimy, porozmawiajmy o systemie 24V.",fmt(max230))});}
     R.inv={type:"ic",va:m.va,w:m.w,ch:m.ch};
   } else if(S.style!=="autark"){R.inv={type:"ch"};} else R.inv=null;
   // bateria
@@ -111,7 +112,7 @@ function compute(){
   let cap=BATT.find(c=>c>=Math.max(needAh,minInv,100));
   if(!cap){cap=1200;R.warn.push({c:"crit",t:"Potrzeba ponad 1200 Ah. Przy takim zużyciu lepszy będzie system 24V."});}
   R.cap=cap;R.bcfg=BCFG[cap];R.heated=S.winter||S.tier!=="eko";R.minInv=minInv;
-  if(minInv>0&&minInv>=needAh)R.warn.push({c:"info",t:"Bateria powiększona do "+minInv+" Ah, żeby udźwignęła pobór falownika "+fmt(R.inv.w)+" W."});
+  if(minInv>0&&minInv>=needAh)R.warn.push({c:"info",t:t("Bateria powiększona do {0} Ah, żeby udźwignęła pobór falownika {1} W.",minInv,fmt(R.inv.w))});
   if(S.winter&&S.tier==="eko")R.warn.push({c:"info",t:"Zimą dobieramy baterię z grzaniem, także w poziomie Ekonomicznym."});
   if(R.inv&&R.inv.type==="ch"){R.inv.a=cap>=400?30:cap>=200?20:15;}
   // solar
@@ -127,11 +128,11 @@ function compute(){
       const n=Math.min(4,Math.max(n1,n2,0));
       for(let k=1;k<=n;k++)opts.push({p:p,n:k,w:p.w*k});
     });
-    if(!opts.length){R.warn.push({c:"warn",t:"Na dachu "+S.roofL+" × "+S.roofW+" cm nie zmieści się żaden panel z odstępem 12 cm. Rozważ mniejsze panele elastyczne."});}
+    if(!opts.length){R.warn.push({c:"warn",t:t("Na dachu {0} × {1} cm nie zmieści się żaden panel z odstępem 12 cm. Rozważ mniejsze panele elastyczne.",S.roofL,S.roofW)});}
     else{
       opts.sort((a,b)=>a.w-b.w||a.n-b.n);
       let ch=opts.find(o=>o.w>=target);
-      if(!ch){ch=opts.reduce((a,b)=>b.w>a.w?b:a);if(S.style!=="kemping")R.warn.push({c:"warn",t:"Dach mieści maksymalnie "+fmt(ch.w)+" Wp. Na pełne pokrycie zużycia latem potrzeba ok. "+fmt(Math.ceil(target/10)*10)+" Wp."});}
+      if(!ch){ch=opts.reduce((a,b)=>b.w>a.w?b:a);if(S.style!=="kemping")R.warn.push({c:"warn",t:t("Dach mieści maksymalnie {0} Wp. Na pełne pokrycie zużycia latem potrzeba ok. {1} Wp.",fmt(ch.w),fmt(Math.ceil(target/10)*10))});}
       R.solar={n:ch.n,pw:ch.p.w,w:ch.w,dim:ch.p.l+" × "+ch.p.b+" mm",target:target};
       R.mppt=MPPT.find(x=>x>=ch.w/12*1.1)||100;
     }
@@ -163,7 +164,7 @@ function compute(){
   add("main","Bateria → szyna główna i wyłącznik",mainI,0.5,0.03);
   if(R.inv)C.push({id:"shore",name:"Gniazdo zasilania → "+(R.inv.type==="ic"?"falownik":"ładowarka"),L:S.len.shore,s:"3 × 2,5",f:16,ft:"wyłącznik różnicowoprądowy + B16",ac:true});
   R.cables=C;
-  C.forEach(c=>{if(c.over)R.warn.push({c:"warn",t:"Obwód \""+c.name+"\" przekracza 95 mm². Przebieg i zabezpieczenie obwodu wymagają indywidualnego doboru przez instalatora."});});
+  C.forEach(c=>{if(c.over)R.warn.push({c:"warn",t:t("Obwód „{0}” przekracza 95 mm². Przebieg i zabezpieczenie obwodu wymagają indywidualnego doboru przez instalatora.",t(c.name))});});
   let lugs=0,meters=0;C.forEach(c=>{meters+=c.ac?c.L:2*c.L;if(!c.ac&&!c.pv)lugs+=4;});
   R.lugs=lugs;R.meters=meters;R.fuseCount=C.filter(c=>c.f&&!c.ac&&!c.pv).reduce((s,c)=>s+(c.ends||1),0);
   return R;
@@ -173,13 +174,13 @@ function compute(){
 function renderSteps() {
   const step = S.step + 1;
   const progress = $("#step-progress");
-  $("#step-count").textContent = "Krok " + step + " z " + STEPS.length;
+  $("#step-count").textContent = t("Krok {0} z {1}", step, STEPS.length);
   progress.innerHTML = STEPS.map((name, index) => {
     const current = index === S.step;
     const complete = index < S.step;
     return '<li class="' + (current ? 'current' : complete ? 'complete' : 'upcoming') + '"' +
       (current ? ' aria-current="step"' : '') + '><span class="segment-line" aria-hidden="true"></span>' +
-      '<span>' + name + '</span>' + (complete ? '<span class="sr-only"> — ukończony</span>' : '') + '</li>';
+      '<span>' + name + '</span>' + (complete ? '<span class="sr-only"> — ' + t('ukończony') + '</span>' : '') + '</li>';
   }).join("");
 }
 function opt(name,val,cur,t,d,type){
@@ -187,7 +188,7 @@ function opt(name,val,cur,t,d,type){
   return '<label class="opt'+(on?" on":"")+'"><input type="'+(type||"radio")+'" name="'+name+'" value="'+val+'"'+(on?" checked":"")+' id="'+name+'-'+val+'"><span class="t">'+t+'</span>'+(d?'<span class="d">'+d+'</span>':'')+'</label>';
 }
 function navHtml(){
-  return '<div class="config-nav"><button type="button" class="btn" id="back"'+(S.step===0?" disabled":"")+'>Wstecz</button>'+(S.step<STEPS.length-1?'<button type="button" class="btn pri" id="next">Dalej: '+STEPS[S.step+1]+'</button>':'')+'</div>';
+  return '<div class="config-nav"><button type="button" class="btn" id="back"'+(S.step===0?" disabled":"")+'>Wstecz</button>'+(S.step<STEPS.length-1?'<button type="button" class="btn pri" id="next">'+t('Dalej:')+' '+t(STEPS[S.step+1])+'</button>':'<button type="submit" form="lead" class="btn pri">Zatwierdź i pobierz PDF</button>')+'</div>';
 }
 function head(t,h){return '<div><h2>'+t+'</h2><p class="hint">'+h+'</p></div>';}
 
@@ -218,12 +219,12 @@ const VIEWS=[
       '<span class="device-label">'+a.n+'<span class="v">'+a.v+' V</span></span><span class="w">'+(on?x.w:a.w)+' W</span>'+
       '<input type="checkbox" id="app-'+a.id+'" data-app="'+a.id+'"'+(on?" checked":"")+'></label>'+
     (on&&S.details?'<div class="det"><input type="number" min="1" step="1" id="w-'+a.id+'" data-f="w" data-id="'+a.id+'" value="'+x.w+'" aria-label="Moc W">W ×<input type="number" min="0" step="0.25" id="h-'+a.id+'" data-f="h" data-id="'+a.id+'" value="'+x.h+'" aria-label="Godziny dziennie">h ×<input type="number" min="1" step="1" id="q-'+a.id+'" data-f="q" data-id="'+a.id+'" value="'+x.q+'" aria-label="Liczba sztuk">szt.</div>':'')+
-    (on?'<span class="ah">'+fmt(appAh(a,x),1)+' Ah/dzień</span>':'')+'</div>';}).join("")+'</div></div>').join("");},
+    (on?'<span class="ah">'+fmt(appAh(a,x),1)+' '+t('Ah/dzień')+'</span>':'')+'</div>';}).join("")+'</div></div>').join("");},
  function(){
   const L=S.len,R=compute();
   const items=[["alt","Akumulator rozruchowy → bateria","Wzdłuż pojazdu, od komory silnika do baterii",true],["roof","Dach → regulator solarny","Od przepustu dachowego do miejsca montażu",!!R.solar],["inv","Bateria → falownik","Im krócej, tym cieńszy kabel",!!R.inv],["fuse","Bateria → rozdzielnica 12V","Do skrzynki z bezpiecznikami odbiorników",true],["shore","Gniazdo zasilania → falownik","Od gniazda na ścianie pojazdu",!!R.inv]];
   return head("Ile kabla trzeba poprowadzić?","Podaj długości w jedną stronę. Na ich podstawie liczymy przekroje i bezpieczniki. Wartości startowe są typowe dla wybranego pojazdu.")+
-  '<div class="cables"><div class="cablelist">'+items.map((it,i)=>'<div class="cable"'+(it[3]?'':' style="opacity:.5"')+'><span class="k">'+(i+1)+'</span><label for="len-'+it[0]+'">'+it[1]+'<small>'+it[2]+(it[3]?'':' (nie dotyczy)')+'</small></label><div><input type="number" id="len-'+it[0]+'" data-len="'+it[0]+'" min="0.2" max="20" step="0.1" value="'+L[it[0]]+'"'+(it[3]?'':' disabled')+'> <span class="unit">m</span></div></div>').join("")+'</div>'+cableDiagram()+'</div>';},
+  '<div class="cables"><div class="cablelist">'+items.map((it,i)=>'<div class="cable"'+(it[3]?'':' style="opacity:.5"')+'><span class="k">'+(i+1)+'</span><label for="len-'+it[0]+'">'+it[1]+'<small>'+t(it[2])+(it[3]?'':' ('+t('nie dotyczy')+')')+'</small></label><div><input type="number" id="len-'+it[0]+'" data-len="'+it[0]+'" min="0.2" max="20" step="0.1" value="'+L[it[0]]+'"'+(it[3]?'':' disabled')+'> <span class="unit">m</span></div></div>').join("")+'</div>'+cableDiagram()+'</div>';},
  function(){return head("Jaki poziom sprzętu?","Każdy poziom liczymy tą samą metodą. Różni się trwałością, gwarancją i wygodą monitorowania.")+
   '<fieldset><legend>Poziom</legend><div class="opts">'+Object.keys(TIERS).map(k=>opt("tier",k,S.tier,TIERS[k].t,TIERS[k].d)).join("")+'</div></fieldset>';},
  function(){return head("Jak chcesz to dostać?","Te same części w każdej opcji. Różni się tylko to, ile pracy zostaje po Twojej stronie.")+
@@ -247,7 +248,7 @@ function cableDiagram() {
     { path: "M60 100V70H110V80", x: 60, y: 78 },
   ];
   const source = isTrailer ? "Gniazdo holownicze" : "Komora silnika";
-  return `<svg class="vansvg" viewBox="0 0 330 156" role="img" aria-label="Poglądowe trasy kabli w wybranym pojeździe">
+  return `<svg class="vansvg" viewBox="0 0 330 156" role="img" aria-label="${t("Poglądowe trasy kabli w wybranym pojeździe")}">
     <image href="${vehicleModel().image}" x="${isTrailer ? 0 : 8}" y="${isTrailer ? 0 : 5}" width="${isTrailer ? 330 : 314}" height="${isTrailer ? 144 : 130}" class="vehicle-image"/>
     ${routes.map(({ path, x, y }, index) => `<g>
       <path d="${path}" class="vc"/>
@@ -263,32 +264,32 @@ function cableDiagram() {
 function summaryHtml(){
   const R=compute();
   const comp=[];
-  comp.push(["Bateria","Bateria litowa LiFePO4 "+R.cap+" Ah ("+R.bcfg+")"+(R.heated?", z grzaniem":""),"ok. "+fmt(R.cap*0.09)+" kg","1"]);
+  comp.push(["Bateria",t("Bateria litowa LiFePO4 {0} Ah ({1})",R.cap,R.bcfg)+(R.heated?", "+t("z grzaniem"):""),t("ok. {0} kg",fmt(R.cap*0.09)),"1"]);
   comp.push(["Bateria",{eko:"Monitoring w aplikacji baterii (Bluetooth)",std:"Bocznik pomiarowy z Bluetooth",pro:"Centrum sterowania z ekranem 7\" i bocznikiem"}[S.tier],"","1"]);
-  if(R.solar){comp.push(["Solar","Panel "+(S.panel==="flex"?"elastyczny":"sztywny")+" "+R.solar.pw+" Wp",R.solar.dim,String(R.solar.n)]);comp.push(["Solar","Regulator solarny MPPT "+R.mppt+" A","","1"]);comp.push(["Solar","Przepust dachowy, złącza MC4, rozłącznik PV","","1 kpl."]);}
-  comp.push(["Jazda","Ładowarka DC-DC "+(S.starter===24?"24/12V ":"")+R.dcdc+" A","20 → 80% w "+fmt(R.dcdcTime,1)+" h jazdy","1"]);
-  if(R.inv&&R.inv.type==="ic")comp.push(["230V","Falownik z ładowarką "+R.inv.va+" VA",fmt(R.inv.w)+" W bez kempingu, ładowanie "+R.inv.ch+" A","1"]);
-  if(R.inv&&R.inv.type==="ch")comp.push(["230V","Ładowarka sieciowa "+R.inv.a+" A","","1"]);
+  if(R.solar){comp.push(["Solar",t(S.panel==="flex"?"Panel elastyczny {0} Wp":"Panel sztywny {0} Wp",R.solar.pw),R.solar.dim,String(R.solar.n)]);comp.push(["Solar",t("Regulator solarny MPPT {0} A",R.mppt),"","1"]);comp.push(["Solar","Przepust dachowy, złącza MC4, rozłącznik PV","","1 kpl."]);}
+  comp.push(["Jazda",t("Ładowarka DC-DC {0} A",(S.starter===24?"24/12 V ":"")+R.dcdc),t("20 → 80% w {0} h jazdy",fmt(R.dcdcTime,1)),"1"]);
+  if(R.inv&&R.inv.type==="ic")comp.push(["230V",t("Falownik z ładowarką {0} VA",R.inv.va),t("{0} W bez kempingu, ładowanie {1} A",fmt(R.inv.w),R.inv.ch),"1"]);
+  if(R.inv&&R.inv.type==="ch")comp.push(["230V",t("Ładowarka sieciowa {0} A",R.inv.a),"","1"]);
   if(R.inv)comp.push(["230V","Gniazdo zasilania CEE, skrzynka z wyłącznikiem różnicowoprądowym, gniazdo 230V","","1 kpl."]);
   comp.push(["12V","Rozdzielnica 12V na 12 obwodów z minusem, gniazda USB-C","","1 kpl."]);
   comp.push(["Ochrona","Wyłącznik główny baterii, szyny zbiorcze, osłony biegunów","","1 kpl."]);
-  const cab=R.cables.map(c=>'<tr><td>'+c.name+'</td><td class="num">'+fmt(c.L,1)+' m</td><td class="num">'+(typeof c.s==="number"?c.s+" mm²":c.s+" mm²")+'</td><td>'+(c.f?(c.ac?c.ft:(c.ends===2?"2 × ":"")+c.ft+" "+c.f+" A"):c.ft)+'</td></tr>').join("");
-  const sel=APPS.filter(a=>S.apps[a.id]).map(a=>a.n+(S.apps[a.id].q>1?" ×"+S.apps[a.id].q:"")).join(", ");
+  const cab=R.cables.map(c=>'<tr><td>'+t(c.name)+'</td><td class="num">'+fmt(c.L,1)+' m</td><td class="num">'+(typeof c.s==="number"?c.s+" mm²":c.s+" mm²")+'</td><td>'+(c.f?(c.ac?t(c.ft):(c.ends===2?"2 × ":"")+t(c.ft)+" "+c.f+" A"):t(c.ft))+'</td></tr>').join("");
+  const sel=APPS.filter(a=>S.apps[a.id]).map(a=>t(a.n)+(S.apps[a.id].q>1?" ×"+S.apps[a.id].q:"")).join(", ");
   return head("Twój system","Sprawdź zestawienie i pobierz propozycję. Dobór elementów i cena wymagają potwierdzenia po weryfikacji instalacji.")+
-  '<div class="kv"><div><b>'+fmt(R.ah)+' Ah</b><span>zużycie na dobę ('+fmt(R.wh)+' Wh)</span></div><div><b>'+R.cap+' Ah</b><span>bateria '+(R.heated?"z grzaniem":"")+'</span></div><div><b>'+(R.solar?fmt(R.solar.w)+" Wp":"brak")+'</b><span>solar na dachu</span></div><div><b>'+(R.inv&&R.inv.type==="ic"?fmt(R.inv.w)+" W":"brak")+'</b><span>moc 230V bez kempingu</span></div></div>'+
+  '<div class="kv"><div><b>'+fmt(R.ah)+' Ah</b><span>'+t('zużycie na dobę ({0} Wh)',fmt(R.wh))+'</span></div><div><b>'+R.cap+' Ah</b><span>'+t('bateria')+(R.heated?' '+t('z grzaniem'):'')+'</span></div><div><b>'+(R.solar?fmt(R.solar.w)+" Wp":"brak")+'</b><span>solar na dachu</span></div><div><b>'+(R.inv&&R.inv.type==="ic"?fmt(R.inv.w)+" W":"brak")+'</b><span>moc 230V bez kempingu</span></div></div>'+
   '<div><h3 style="margin:0 0 8px;font-size:16px">Podzespoły</h3><div class="tablewrap"><table><thead><tr><th>Moduł</th><th>Element</th><th>Parametry</th><th>Ilość</th></tr></thead><tbody>'+comp.map(r=>'<tr><td class="mod">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td></tr>').join("")+'</tbody></table></div></div>'+
-  '<div><h3 style="margin:0 0 8px;font-size:16px">Kable i zabezpieczenia</h3><div class="tablewrap"><table><thead><tr><th>Obwód</th><th>Długość</th><th>Przekrój</th><th>Zabezpieczenie</th></tr></thead><tbody>'+cab+'</tbody></table></div><p class="note">Razem ok. '+fmt(Math.ceil(R.meters))+' m kabla, '+R.lugs+' końcówek rurkowych zaciskanych hydraulicznie, '+R.fuseCount+' bezpieczników DC. Przekroje liczone przy 40°C, ze spadkiem napięcia 3% (7% dla ładowarki DC-DC) i 25% zapasu prądu.</p></div>'+
-  '<p class="note"><b>Urządzenia:</b> '+(sel||"brak")+'. <b>Poziom:</b> '+TIERS[S.tier].t+'. <b>Realizacja:</b> '+DELIV[S.deliv].t+'.</p>'+
+  '<div><h3 style="margin:0 0 8px;font-size:16px">Kable i zabezpieczenia</h3><div class="tablewrap"><table><thead><tr><th>Obwód</th><th>Długość</th><th>Przekrój</th><th>Zabezpieczenie</th></tr></thead><tbody>'+cab+'</tbody></table></div><p class="note">'+t('Razem ok. {0} m kabla, {1} końcówek rurkowych zaciskanych hydraulicznie, {2} bezpieczników DC. Przekroje liczone przy 40°C, ze spadkiem napięcia 3% (7% dla ładowarki DC-DC) i 25% zapasu prądu.',fmt(Math.ceil(R.meters)),R.lugs,R.fuseCount)+'</p></div>'+
+  '<p class="note"><b>'+t("Urządzenia")+':</b> '+(sel||t("brak"))+'. <b>'+t("Poziom")+':</b> '+t(TIERS[S.tier].t)+'. <b>'+t("Realizacja")+':</b> '+t(DELIV[S.deliv].t)+'.</p>'+
   formHtml();
 }
 function formHtml(){
   const c=S.contact;
-  return '<form id="lead"><h3 style="margin:0 0 10px;font-size:16px">Dane do propozycji</h3><div class="row"><div class="field"><label for="c-name">Imię</label><input id="c-name" name="name" autocomplete="name" value="'+esc(c.name||"")+'"></div><div class="field"><label for="c-mail">E-mail</label><input id="c-mail" name="mail" type="email" autocomplete="email" value="'+esc(c.mail||"")+'"></div><div class="field"><label for="c-tel">Telefon</label><input id="c-tel" name="tel" type="tel" autocomplete="tel" value="'+esc(c.tel||"")+'"></div></div><div class="field" style="margin-top:12px"><label for="c-msg">Uwagi (opcjonalnie)</label><textarea id="c-msg" name="msg" rows="3" maxlength="1500">'+esc(c.msg||"")+'</textarea></div><p class="note" id="formerr" style="color:var(--crit)" hidden>Podaj poprawny e-mail albo numer telefonu zawierający co najmniej 9 cyfr.</p><p class="note" role="status" id="pdf-status"></p><div class="config-nav" style="margin-top:14px"><button type="button" class="btn" id="back">Wstecz</button><button type="submit" class="btn pri">Zatwierdź i pobierz PDF</button></div></form>';
+  return '<form id="lead"><h3 style="margin:0 0 10px;font-size:16px">Dane do propozycji</h3><div class="row"><div class="field"><label for="c-name">Imię</label><input id="c-name" name="name" autocomplete="name" value="'+esc(c.name||"")+'"></div><div class="field"><label for="c-mail">E-mail</label><input id="c-mail" name="mail" type="email" autocomplete="email" value="'+esc(c.mail||"")+'"></div><div class="field"><label for="c-tel">Telefon</label><input id="c-tel" name="tel" type="tel" autocomplete="tel" value="'+esc(c.tel||"")+'"></div></div><div class="field" style="margin-top:12px"><label for="c-msg">Uwagi (opcjonalnie)</label><textarea id="c-msg" name="msg" rows="3" maxlength="1500">'+esc(c.msg||"")+'</textarea></div><p class="note" id="formerr" style="color:var(--crit)" hidden>Podaj poprawny e-mail albo numer telefonu zawierający co najmniej 9 cyfr.</p><p class="note" role="status" id="pdf-status"></p></form>';
 }
 /* ---------- panel boczny ---------- */
 function renderAside(){
   const R=compute();
-  $("#sysTier").textContent=TIERS[S.tier].t.toUpperCase();
+  $("#sysTier").textContent=t(TIERS[S.tier].t).toLocaleUpperCase(locale);
   const acAvailable = R.inv?.type === "ic";
   const readings = {
     solar: R.solar ? R.solar.n + " × " + R.solar.pw + " Wp" : "brak",
@@ -301,11 +302,11 @@ function renderAside(){
   const diagram = $("#diagram");
   for (const [key, value] of Object.entries(readings)) {
     const active = value !== "brak";
-    diagram.querySelector('[data-reading="' + key + '"]').textContent = value;
+    diagram.querySelector('[data-reading="' + key + '"]').textContent = t(value);
     diagram.querySelector('[data-node="' + key + '"]').classList.toggle("inactive", !active);
     diagram.querySelector('[data-branch="' + key + '"]')?.classList.toggle("inactive", !active);
   }
-  diagram.setAttribute("aria-label", "Schemat instalacji. " +
+  diagram.setAttribute("aria-label", t("Schemat instalacji.") + " " +
     [...diagram.querySelectorAll("[data-node]")].map(node =>
       node.querySelector(".circuit-label").textContent + ": " +
       node.querySelector(".circuit-value").textContent).join(". "));
@@ -315,8 +316,8 @@ function renderAside(){
   });
   $("#summer-bar").style.width=Math.min(100,R.dS/30*100)+"%";
   $("#winter-bar").style.width=Math.min(100,R.dW/30*100)+"%";
-  $("#cable-totals").textContent=fmt(Math.ceil(R.meters))+" m kabla · "+R.lugs+" końcówek · "+R.fuseCount+" bezpieczników";
-  $("#warns").innerHTML=R.warn.map(w=>'<li class="'+(w.c==="warn"?"":w.c)+'">'+w.t+'</li>').join("");
+  $("#cable-totals").textContent=t("{0} m kabla · {1} końcówek · {2} bezpieczników",fmt(Math.ceil(R.meters)),R.lugs,R.fuseCount);
+  $("#warns").innerHTML=R.warn.map(w=>'<li class="'+(w.c==="warn"?"":w.c)+'">'+t(w.t)+'</li>').join("");
 }
 
 function render(){
@@ -324,10 +325,18 @@ function render(){
   const preview = $("#vehicle-preview");
   if (preview.getAttribute("src") !== model.image) {
     preview.src = model.image;
-    preview.alt = model.alt;
+
     preview.height = model.height;
   }
-  renderSteps();$("#panel").innerHTML=VIEWS[S.step]()+(S.step<STEPS.length-1?navHtml():"");renderAside();}
+  preview.alt = t(model.alt);
+  renderSteps();
+  $("#panel").innerHTML = VIEWS[S.step]();
+  $("#wizard-actions").innerHTML = navHtml();
+  localize($("#wizard-actions"));
+  localize($("#panel"));
+  localize($("#step-progress"));
+  renderAside();
+}
 function go(index) {
   const step = Math.max(0, Math.min(STEPS.length - 1, index));
   if (step === S.step) return;
@@ -385,7 +394,7 @@ document.addEventListener("input",e=>{
   else if(t.id==="roofW"&&v>0){S.roofW=v;renderAside();}
   else if(t.id==="drive"&&v>=0){S.drive=v;renderAside();}
   else if(t.dataset.len&&v>0){S.len[t.dataset.len]=v;renderAside();}
-  else if(t.dataset.f&&v>=0){const x=S.apps[t.dataset.id];if(x){x[t.dataset.f]=v;S.preset="";const card=t.closest(".app");const a=APPS.find(z=>z.id===t.dataset.id);card.querySelector(".ah").textContent=fmt(appAh(a,x),1)+" Ah/dzień";card.querySelector(".w").textContent=x.w+" W";renderAside();}}
+  else if(t.dataset.f&&v>=0){const x=S.apps[t.dataset.id];if(x){x[t.dataset.f]=v;S.preset="";const card=t.closest(".app");const a=APPS.find(z=>z.id===t.dataset.id);card.querySelector(".ah").textContent=fmt(appAh(a,x),1)+" "+t("Ah/dzień");card.querySelector(".w").textContent=x.w+" W";renderAside();}}
   else if(t.closest&&t.closest("#lead")){S.contact[t.name]=t.value;}
 });
 document.addEventListener("submit",async e=>{
@@ -394,7 +403,7 @@ document.addEventListener("submit",async e=>{
   const c=Object.fromEntries(new FormData(e.target));
   const error=$("#formerr"), status=$("#pdf-status"), button=e.submitter;
   error.hidden=!!(c.mail.trim()||c.tel.replace(/\D/g,"").length>=9);
-  if(!error.hidden)return;
+  if(!error.hidden){ $("#c-mail").focus(); return; }
   const R=compute();
   const tables=[...document.querySelectorAll("#panel table")].map(table=>
     [...table.rows].map(row=>[...row.cells].map(cell=>cell.textContent.trim())));
@@ -403,19 +412,22 @@ document.addEventListener("submit",async e=>{
     ["Panele dachowe",{rigid:"Sztywne",flex:"Elastyczne",none:"Bez paneli"}[S.panel]],
     ["Wolna powierzchnia dachu",S.panel==="none"?"Nie dotyczy":S.roofL+" × "+S.roofW+" cm"],
     ["Styl podróży",{autark:"Na dziko",kemping:"Na kempingach",oba:"Mieszany"}[S.style]],
-    ["Postój bez ładowania",S.days+" dni"], ["Sezon",S.winter?"Także zimą":"Od wiosny do jesieni"],
-    ["Średni czas jazdy",fmt(S.drive,1)+" h/dzień"], ["Poziom sprzętu",TIERS[S.tier].t],
+    ["Postój bez ładowania",t(S.days==="10+"?"Ponad 10 dni":S.days+" dni")], ["Sezon",S.winter?"Także zimą":"Od wiosny do jesieni"],
+    ["Średni czas jazdy",fmt(S.drive,1)+" "+t("h/dzień")], ["Poziom sprzętu",TIERS[S.tier].t],
     ["Forma realizacji",DELIV[S.deliv].t], ["Zużycie na dobę",fmt(R.wh)+" Wh / "+fmt(R.ah)+" Ah"],
-    ["Szacowana autonomia",fmt(R.dS,1)+" dni latem / "+fmt(R.dW,1)+" dni zimą"],
-    ["Kable i osprzęt",fmt(Math.ceil(R.meters))+" m kabla / "+R.lugs+" końcówek / "+R.fuseCount+" bezpieczników DC"],
+    ["Szacowana autonomia",t("{0} dni latem / {1} dni zimą",fmt(R.dS,1),fmt(R.dW,1))],
+    ["Kable i osprzęt",t("{0} m kabla / {1} końcówek / {2} bezpieczników DC",fmt(Math.ceil(R.meters)),R.lugs,R.fuseCount)],
   ];
   const equipment=APPS.filter(app=>S.apps[app.id]).map(app=>{
     const item=S.apps[app.id];
-    return [app.n,app.v+" V",item.w+" W",fmt(item.h,2)+" h",String(item.q)];
+    return [t(app.n),app.v+" V",item.w+" W",fmt(item.h,2)+" h",String(item.q)];
   });
+  const proposalLocale = locale;
+  const proposalTranslate = translator(language);
   const proposalImage = vehicleModel().proposal;
   button.disabled=true;
-  status.textContent="Przygotowywanie PDF…";
+  status.textContent=t("Przygotowywanie PDF…");
+  status.scrollIntoView({ block: "nearest" });
   try{
     const {downloadProposal}=await import("./proposal.js");
     const totals = [
@@ -423,14 +435,30 @@ document.addEventListener("submit",async e=>{
       { label: "Pojemność baterii", value: fmt(R.cap) + " Ah" },
       { label: "Moc paneli", value: fmt(R.solar?.w ?? 0) + " Wp" },
     ];
-    await downloadProposal({contact:c,options,equipment,tables,totals,proposalImage,warnings:R.warn.map(item=>item.t)});
-    status.textContent="Propozycja PDF jest gotowa do pobrania.";
+    await downloadProposal({contact:c,options:options.map(row=>row.map(value=>t(value))),equipment,tables,totals,proposalImage,warnings:R.warn.map(item=>t(item.t)), locale: proposalLocale, translate: proposalTranslate});
+    status.textContent=t("Propozycja PDF jest gotowa do pobrania.");
   }catch(error){
     console.error(error);
-    status.textContent="Nie udało się wygenerować PDF. Spróbuj ponownie.";
+    status.textContent=t("Nie udało się wygenerować PDF. Spróbuj ponownie.");
   }finally{
     button.disabled=false;
   }
 });
-render();
+function applyLanguage() {
+  document.documentElement.lang = language;
+  document.title = t("Konfigurator elektryki") + " — BZQ Camp";
+  document.querySelectorAll("[data-language]").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.language === language));
+  });
+  localize(document.body);
+  redrawMeters();
+  render();
+}
+document.querySelectorAll("[data-language]").forEach(button => {
+  button.addEventListener("click", () => {
+    setLanguage(button.dataset.language);
+    applyLanguage();
+  });
+});
+applyLanguage();
 })();

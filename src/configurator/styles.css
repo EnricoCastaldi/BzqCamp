@@ -25,7 +25,7 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
-.config-wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.config-wrap { margin-inline: auto; }
 h1{font-family:var(--f-display);font-stretch:112%;font-weight:750;font-size:clamp(26px,4vw,36px);line-height:1.1;margin:0;text-wrap:balance}
 .lead{color:var(--muted);max-width:62ch;margin:6px 0 0}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
@@ -140,7 +140,6 @@ pre.cfg{white-space:pre-wrap;font:12.5px/1.5 var(--f-mono);background:var(--bg);
   --f-body:system-ui,sans-serif; --f-mono:ui-monospace,monospace;
 }
 body { margin:0; padding:0; }
-.config-wrap { width:min(1180px, calc(100% - 36px)); padding-bottom:48px; }
 #config-chrome { display:contents; }
 .config-intro h1 { line-height:1.04; }
 .config-intro { padding-block:22px 10px; }
@@ -155,7 +154,6 @@ body { margin:0; padding:0; }
 .vansvg .vc { paint-order: stroke; filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff); }
 .vansvg .vk, .vansvg .vbat { stroke: #fff; stroke-width: 1.25; }
 
-.config-wrap { width: min(1320px, calc(100% - 48px)); gap: 30px; }
 .config-intro {
   display: grid;
   grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
@@ -163,8 +161,7 @@ body { margin:0; padding:0; }
   gap: clamp(20px, 4vw, 64px);
   margin-top: 24px;
   padding: clamp(24px, 5vw, 70px);
-  border: 1px solid #e1d7c6;
-  border-radius: 8px 36px 8px 36px;
+  border-bottom: 1px solid var(--line);
   background: radial-gradient(ellipse at 75% 35%, #fff 0%, #f4eee2 72%);
 }
 .config-intro h1 { font-size: clamp(2.6rem, 5.4vw, 5.6rem); font-weight: 650; line-height: .96; letter-spacing: -.075em; }
@@ -187,7 +184,6 @@ body { margin:0; padding:0; }
 .stat .n small { letter-spacing: 0; }
 .bar i { transition: width .55s ease-out; }
 @media (max-width: 760px) {
-  .config-wrap { width: calc(100% - 28px); }
   .config-intro { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .showroom-vehicle img { max-height: 310px; object-fit: contain; }
   .showroom-metrics small { font-size: .72rem; }
@@ -222,34 +218,82 @@ body { margin:0; padding:0; }
 .device-label { min-width: 0; overflow-wrap: anywhere; }
 .app .v { display: inline-block; white-space: nowrap; }
 .app input[type="checkbox"] { accent-color: #765a31; margin: 0; }
-@container (max-width: 650px) { .wizard-segments { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@container (max-width: 525px) { .wizard-segments { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 .wizard-progress { container-type: inline-size; }
 @container (max-width: 340px) { .wizard-segments { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-.config-page .grid {
-  height: max(360px, calc(100dvh - var(--site-header-height) - 30px));
-  align-items: stretch;
-  grid-template-rows: minmax(0, 1fr);
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
-}
 .config-page #main { display: flex; flex-direction: column; min-height: 0; }
 .wizard-progress { flex: 0 0 auto; }
-.wizard-scroll, .system-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.wizard-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; }
 .wizard-scroll { flex: 1 1 0; scrollbar-gutter: stable; }
 .config-page #aside { position: static; min-height: 0; }
-.config-page .sys { flex: 1 1 0; min-height: 0; overflow: clip; padding: 14px; }
-.system-scroll { display: flex; flex-direction: column; gap: 10px; }
-.system-scroll > * { flex: 0 0 auto; }
-.system-scroll .diagram { width: min(100%, 290px); align-self: center; }
-@media (max-width: 760px) {
-  .config-page .grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px; }
-  .config-page #aside { grid-row: 1; }
-  .config-page .sys { flex: 0 0 auto; max-height: clamp(70px, 15dvh, 120px); gap: 5px; padding: 8px 12px; }
-  .system-scroll .stats { order: -1; }
-  .system-scroll .stat .n { font-size: 1.15rem; }
-  .config-page .wizard-progress { padding-block: 8px; }
-  .config-page .wizard-segments { margin-top: 5px; row-gap: 4px; }
+.config-page .sys { padding: 14px; }
+.system-details { display: flex; flex-direction: column; gap: 8px; }
+.system-details .diagram { width: 100%; height: auto; }
+#wizard-actions { flex: 0 0 auto; background: #f7f4ed; }
+#wizard-actions .config-nav { margin: 0; padding: 10px clamp(14px, 2.5vw, 26px); }
+#wizard-actions .btn { min-height: 42px; }
+.config-overview { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: clip; }
+.config-page .config-wrap { width: 100%; padding: 12px clamp(12px, 1.5vw, 26px); gap: 14px; }
+.config-page .config-intro { margin: 0; }
+.config-page .config-footer { padding-block: 5px 8px; color: #e6dece; font-size: .75rem; }
+.opt:focus-within { outline: 2px solid #765a31; outline-offset: 2px; }
+
+@media (min-width: 900px) {
+  body.config-page { display: grid; grid-template-rows: auto 1fr auto; min-height: 100dvh; }
+  .config-page .config-brandbar-inner { min-height: 56px; }
+  .config-page .config-wrap {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 37fr) minmax(0, 63fr);
+    align-items: start;
+  }
+  .config-page #main { height: max(380px, calc(100dvh - 112px)); }
+  .config-page .config-intro {
+    display: block;
+    padding: clamp(12px, 1.35vw, 22px);
+  }
+  .config-intro h1 {
+    font-size: clamp(1.45rem, 2.5vw, 2.85rem);
+    line-height: 1.04;
+    text-wrap: pretty;
+  }
+  .config-intro .lead { font-size: .82rem; line-height: 1.4; margin-block: 6px 0; }
+  .config-intro .eyebrow { font-size: .66rem; margin-bottom: 5px; }
+  .showroom-vehicle img {
+    display: block;
+    height: clamp(62px, 12dvh, 144px);
+    object-fit: contain;
+    margin-top: 6px;
+  }
+  .showroom-metrics { margin-top: 6px; gap: 8px; }
+  .showroom-metrics > div { padding-top: 5px; }
+  .showroom-metrics dd { font-size: clamp(1.25rem, 2.15vw, 2.35rem); }
+  .showroom-metrics small, .showroom-metrics dt { font-size: clamp(.62rem, .85vw, .77rem); }
+  .config-page .sys { gap: 8px; padding: 10px 12px; }
+  .system-details .diagram { max-height: clamp(135px, 27dvh, 310px); }
+  .system-details { gap: 6px; }
+  .system-details .stats { gap: 5px; }
+  .system-details .stat { padding: 5px 8px; }
+  .system-details .stat .n { font-size: clamp(1.25rem, 2.6dvh, 2.1rem); }
+  .wizard-progress { padding-block: 14px; }
+  .config-page .panel { gap: 17px; }
+  .config-page .opt { padding: 12px; }
+}
+
+@media (min-width: 900px) and (max-height: 700px) {
+  .config-page .config-wrap { padding-block: 8px; }
+  .config-page .config-intro { padding-block: 9px; }
+  .config-intro h1 { font-size: clamp(1.35rem, 2vw, 2rem); }
+  .showroom-vehicle img { height: clamp(48px, 10dvh, 75px); }
+}
+
+@media (max-width: 899px) {
+  .config-page .config-wrap { display: flex; flex-direction: column; }
+  .config-page #main { height: clamp(390px, 76dvh, 850px); scroll-margin-top: 88px; }
+  .config-page .wizard-progress { padding-block: 10px; }
+  .config-page .wizard-segments { margin-top: 6px; row-gap: 4px; }
 }
 
 .config-page { --lime: #ddc69b; --dark: #1d1b19; }
@@ -262,3 +306,17 @@ body { margin:0; padding:0; }
 .vansvg .vk { fill: var(--wire); }
 .vansvg .vbat { fill: var(--accent); }
 .vansvg .vl { fill: var(--muted); font: 500 10px var(--f-body); }
+
+.config-brandbar { position: sticky; inset-block-start: 0; z-index: 20; background: #1d1b19; color: #fff9ee; border-bottom: 1px solid #c5aa7550; }
+.config-brandbar-inner { width: min(1320px, calc(100% - 32px)); min-height: var(--site-header-height, 76px); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.config-brand img { display: block; object-fit: contain; }
+.config-brand-actions { display: flex; align-items: center; gap: clamp(12px, 3vw, 36px); }
+.config-return { font-size: .85rem; color: #fff9ee; }
+.config-return:is(:hover, :focus-visible) { color: #ddc69b; }
+.config-languages { display: flex; gap: 3px; padding: 3px; border: 1px solid #b89a6266; border-radius: 7px 15px 7px 15px; }
+.config-languages button { display: grid; place-items: center; width: 38px; height: 36px; border: 1px solid transparent; border-radius: 5px 10px 5px 10px; background: transparent; padding: 5px; cursor: pointer; transition: background .2s, border-color .2s; }
+.config-languages button:is(:hover, :focus-visible) { background: #453724; }
+.config-languages button[aria-pressed=true] { border-color: #ddb87b; background: #4a3b28; }
+.config-languages svg { display: block; width: 22px; height: auto; border-radius: 2px; box-shadow: 0 0 0 1px #fff3; }
+@media (max-width: 380px) { .config-brand-actions { gap: 8px; } .config-return { font-size: .74rem; } .config-languages button { width: 33px; } }
+.config-footer { display: flex; justify-content: space-between; gap: 12px; padding: 22px max(16px, calc((100% - 1320px) / 2)); font-size: .9rem; }

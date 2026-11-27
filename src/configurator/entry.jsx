@@ -1,7 +1,5 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from '../App';
 import '../styles.css';
 import './main';
 
-createRoot(document.getElementById('config-chrome')).render(<App configurator/>);
+const storefront = import.meta.env.VITE_STOREFRONT_URL || '/';
+document.querySelectorAll('[data-storefront]').forEach(link => { link.href = storefront; });

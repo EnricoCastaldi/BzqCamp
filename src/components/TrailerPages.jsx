@@ -1,5 +1,9 @@
 import React from 'react';
 
+import TrailerInquiry from './TrailerInquiry';
+import RestorationModels from './RestorationModels';
+import TrailerPhotos from './TrailerPhotos';
+
 const pages = {
   renowacje: {
     title: 'Renowacje przyczep kempingowych',
@@ -28,7 +32,7 @@ const pages = {
       ['Renowacja', 'Podaj model, stan przyczepy i zakres planowanych prac. Przygotuj zdjęcia z zewnątrz i ze środka.'],
       ['Budowa na zamówienie', 'Napisz, ile osób będzie podróżować, jakiego wyposażenia potrzebujesz i kiedy chcesz rozpocząć projekt.'],
     ],
-    cta: 'Otwórz aktualną stronę BZQ Camp',
+    cta: 'Wyślij opis i zdjęcia',
   },
 };
 
@@ -39,6 +43,7 @@ export default function TrailerPage({ page }) {
       <div className="wrap">
         <h1>{title}</h1>
         <p>{intro}</p>
+        <a className="button primary" href="#zapytanie">{cta}</a>
       </div>
     </div>
     <div className="section wrap">
@@ -47,7 +52,8 @@ export default function TrailerPage({ page }) {
           <h2>{heading}</h2><p>{copy}</p>
         </section>)}
       </div>
-      <a className="button primary" href={page === 'kontakt' ? 'https://www.bzqcamp.pl/' : '/kontakt.html'}>{cta}</a>
+      <TrailerInquiry source={page}/>
+      {page === 'renowacje' ? <RestorationModels/> : <TrailerPhotos/>}
     </div>
   </main>;
 }

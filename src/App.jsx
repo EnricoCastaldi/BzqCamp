@@ -3,10 +3,14 @@ import { createPortal } from 'react-dom';
 import HeroCounters from './components/HeroCounters';
 import TrailerPage from './components/TrailerPages';
 import { SiteHeader, SiteFooter } from './components/SiteChrome';
-import { ChevronDown, Plus, Minus, ShoppingBag, X, Zap } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Plus, Minus, ShoppingBag, X, Zap } from 'lucide-react';
 import VehicleSearch from './components/VehicleSearch';
 import Panel from './components/Panel';
 import { money, products, vehicles } from './catalog';
+
+import TrailerInquiry from './components/TrailerInquiry';
+import RestorationModels from './components/RestorationModels';
+import { configuratorUrl, configuratorLabel } from './site-settings';
 
 const cartKey = 'bzq-demo-cart';
 
@@ -108,7 +112,7 @@ export default function App({ configurator = false, page }) {
         <p className="intro">Ręcznie odnawiamy klasyczne przyczepy kempingowe, w szczególności starsze modele Niewiadów. <span>Budujemy też nowe przyczepy na indywidualne zamówienie.</span></p>
         <div className="hero-actions">
           <a className="button primary trailer-action" href="/renowacje.html">Poznaj renowacje</a>
-          <a className="button outline trailer-action" href="/kontakt.html">Porozmawiajmy o Twojej przyczepie</a>
+          <a className="button outline trailer-action" href="#zapytanie">Porozmawiajmy o Twojej przyczepie</a>
         </div>
       </div>
       <HeroCounters/>
@@ -127,6 +131,7 @@ export default function App({ configurator = false, page }) {
           <article data-scroll-reveal><h3>Starsze modele Niewiadów</h3><p>Zakres prac ustalamy po obejrzeniu przyczepy. Bierzemy pod uwagę jej stan i to, które elementy warto zachować.</p></article>
           <article data-scroll-reveal><h3>Praca ręczna, detal po detalu</h3><p>Renowacja często trwa wiele tygodni. Dobieramy materiały i ręcznie dopasowujemy elementy do konkretnej przyczepy.</p></article>
         </div>
+        <RestorationModels/>
         <div className="restoration-process">
           <h3 data-scroll-reveal>Jak zaczynamy renowację</h3>
           <ol>
@@ -135,6 +140,7 @@ export default function App({ configurator = false, page }) {
             <li data-scroll-reveal><h4>Zakres i termin</h4><p>Po oględzinach omawiamy materiały, kolejność prac i przewidywany termin.</p></li>
           </ol>
           <a className="button primary" href="/renowacje.html" data-scroll-reveal>Więcej o renowacjach</a>
+          <a className="inquiry-link" href="#zapytanie">Wyślij opis i zdjęcia</a>
         </div>
       </section>
       <section className="trailer-build" id="budowa">
@@ -142,20 +148,16 @@ export default function App({ configurator = false, page }) {
           <p className="eyebrow">Budowa na zamówienie</p>
           <h2>Przyczepa dopasowana do Twoich podróży</h2>
           <p>Rozmawiamy o tym, jak podróżujesz i czego potrzebujesz na postoju. Na tej podstawie ustalamy układ wnętrza, materiały i wyposażenie nowej przyczepy.</p>
-          <a className="button primary" href="/budowa.html">Poznaj budowę na zamówienie</a>
+          <a className="button primary" href="/budowa.html#zapytanie">Zapytaj o budowę</a>
         </div>
       </section>
-      <section className="section wrap trailer-contact" id="kontakt">
-        <div data-scroll-reveal><p className="eyebrow">Kontakt</p><h2>Opowiedz nam o swojej przyczepie</h2></div>
-        <div data-scroll-reveal><p>W sprawie renowacji przygotuj model, zdjęcia przyczepy i krótki opis jej stanu. Przy budowie opowiedz nam, jak chcesz korzystać z nowej przyczepy.</p>
-          <a className="button primary" href="/kontakt.html">Przejdź do kontaktu</a></div>
-      </section>
+      <div className="section wrap" id="kontakt"><TrailerInquiry source="home"/></div>
       <section className="config-promo wrap" aria-labelledby="config-heading">
         <div className="config-promo-copy" data-scroll-reveal>
-          <p className="eyebrow">Instalacje do kamperów</p>
-          <h2 id="config-heading">Zaplanuj zasilanie kampera</h2>
+          <p className="eyebrow">Instalacje elektryczne</p>
+          <h2 id="config-heading">Zaplanuj zasilanie przyczepy</h2>
           <p>Dobierz instalację elektryczną do pojazdu i wyposażenia. Sprawdź szacunkowe zużycie energii i pobierz propozycję w PDF.</p>
-          <a className="button primary" href="/konfigurator.html"><Zap size={18} aria-hidden="true"/> Otwórz konfigurator</a>
+          <a className="button primary" href={configuratorUrl} target="_blank" rel="noopener"><Zap size={18} aria-hidden="true"/> {configuratorLabel} <ArrowUpRight size={17} aria-hidden="true"/><span className="sr-only"> (otwiera się w nowej karcie)</span></a>
         </div>
       </section>
       <section className="shop" id="produkty">

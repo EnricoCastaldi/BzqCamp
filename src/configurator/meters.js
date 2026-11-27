@@ -1,6 +1,12 @@
+import { locale } from './language.js';
 const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const integers = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 });
-const decimals = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 1 });
+let integers, decimals;
+
+export function redrawMeters() {
+  integers = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
+  decimals = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+  meters.forEach(meter => draw(meter, meter.value));
+}
 const meters = [...document.querySelectorAll('[data-meter]')].map(element => ({
   element,
   key: element.dataset.meter,

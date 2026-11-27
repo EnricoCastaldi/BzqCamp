@@ -1,16 +1,33 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      input: {
-        storefront: fileURLToPath(new URL('./index.html', import.meta.url)),
-        renowacje: fileURLToPath(new URL('./renowacje.html', import.meta.url)),
-        budowa: fileURLToPath(new URL('./budowa.html', import.meta.url)),
-        kontakt: fileURLToPath(new URL('./kontakt.html', import.meta.url)),
-        configurator: fileURLToPath(new URL('./konfigurator.html', import.meta.url)),
+const page = name => fileURLToPath(new URL(name, import.meta.url));
+
+export default defineConfig(({ mode }) => {
+  const standalone = mode === 'configurator';
+  return {
+    plugins: standalone ? [{
+      name: 'configurator-homepage',
+      enforce: 'post',
+      generateBundle(_options, bundle) {
+        const html = bundle['konfigurator.html'];
+        if (!html) this.error('Configurator HTML was not built');
+        delete bundle['konfigurator.html'];
+        html.fileName = 'index.html';
+        bundle['index.html'] = html;
+      },
+    }] : [],
+    build: {
+      outDir: standalone ? 'dist-configurator' : 'dist',
+      rollupOptions: {
+        input: standalone ? page('./konfigurator.html') : {
+          storefront: page('./index.html'),
+          renowacje: page('./renowacje.html'),
+          budowa: page('./budowa.html'),
+          kontakt: page('./kontakt.html'),
+          configurator: page('./konfigurator.html'),
+        },
       },
     },
-  },
+  };
 });

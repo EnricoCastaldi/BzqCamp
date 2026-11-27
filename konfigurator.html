@@ -6,14 +6,26 @@
   <title>Konfigurator elektryki — BZQ Camp</title>
 </head>
 <body class="config-page">
-<div id="config-chrome"></div>
+<header class="config-brandbar">
+  <div class="config-brandbar-inner">
+    <a class="config-brand" data-storefront href="/" aria-label="BZQ Camp"><img src="/media/logo.png" width="56" height="40" alt="BZQ Camp"></a>
+    <div class="config-brand-actions">
+      <a class="config-return" data-storefront href="/">Wróć do BZQ Camp</a>
+      <div class="config-languages" aria-label="Język konfiguratora" role="group">
+        <button type="button" data-language="pl" aria-label="Polski" title="Polski" lang="pl"><svg viewBox="0 0 24 16" aria-hidden="true"><path fill="#fff" d="M0 0h24v16H0z"/><path fill="#dc143c" d="M0 8h24v8H0z"/></svg></button>
+        <button type="button" data-language="en" aria-label="English" title="English" lang="en"><svg viewBox="0 0 24 16" aria-hidden="true"><path fill="#173273" d="M0 0h24v16H0z"/><path stroke="#fff" stroke-width="4" d="m0 0 24 16M24 0 0 16"/><path stroke="#c8102e" stroke-width="1.5" d="m0 0 24 16M24 0 0 16"/><path stroke="#fff" stroke-width="5.5" d="M12 0v16M0 8h24"/><path stroke="#c8102e" stroke-width="3" d="M12 0v16M0 8h24"/></svg></button>
+        <button type="button" data-language="de" aria-label="Deutsch" title="Deutsch" lang="de"><svg viewBox="0 0 24 16" aria-hidden="true"><path fill="#171717" d="M0 0h24v16H0z"/><path fill="#dd0000" d="M0 5.33h24v10.67H0z"/><path fill="#ffce00" d="M0 10.67h24V16H0z"/></svg></button>
+      </div>
+    </div>
+  </div>
+</header>
 <div class="config-wrap">
+  <div class="config-overview card">
   <section class="config-intro" aria-labelledby="config-title">
     <div class="showroom-copy">
       <p class="eyebrow">Konfigurator elektryki</p>
       <h1 id="config-title">Zasilanie na Twoich zasadach</h1>
-      <p class="lead">Dopasuj instalację do swojego kampera i pobierz propozycję w PDF.</p>
-      <a class="button primary" href="#main">Rozpocznij konfigurację</a>
+      <p class="lead">Dopasuj instalację do swojej przyczepy lub kampera i pobierz propozycję w PDF.</p>
     </div>
     <div class="showroom-vehicle">
       <img id="vehicle-preview" src="/media/camper-side.webp" alt="Kamper widziany z boku" width="960" height="480">
@@ -25,20 +37,10 @@
     </div>
   </section>
 
-  <div class="grid">
-    <main class="card" id="main">
-      <div class="wizard-progress">
-        <div class="wizard-status" id="step-count"></div>
-        <ol id="step-progress" class="wizard-segments" aria-label="Kroki konfiguratora"></ol>
-      </div>
-      <div class="wizard-scroll" id="wizard-scroll" tabindex="0" role="region" aria-label="Opcje konfiguracji">
-        <section class="panel" id="panel"></section>
-      </div>
-    </main>
     <aside id="aside" aria-label="Podgląd instalacji">
-      <div class="card sys">
-        <h2 id="system-title">Twój system <span id="sysTier"></span></h2>
-        <div class="system-scroll" tabindex="0" role="region" aria-labelledby="system-title">
+      <div class="sys">
+        <h2 id="system-title">Twój system <span id="sysTier" data-live-translation></span></h2>
+        <div class="system-details">
         <svg class="diagram" id="diagram" viewBox="0 0 360 282" role="img" aria-label="Schemat instalacji elektrycznej">
         <defs><pattern id="circuit-grid" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="1" fill="#ddd1bd"/></pattern></defs>
         <rect width="360" height="282" rx="14" fill="url(#circuit-grid)"/>
@@ -98,14 +100,23 @@
           <div class="stat wide"><div class="l">Kable i zabezpieczenia</div><div id="cable-totals"></div></div>
         </div>
         <ul class="warns" id="warns"></ul>
-        <p class="note">Wstępny dobór wymaga weryfikacji przez instalatora przed zakupem lub montażem. Uzysk solaru przyjęty dla Polski: lato ok. 4 h, zima ok. 0,7 h pełnego słońca dziennie.</p>
         </div>
       </div>
     </aside>
   </div>
+    <main class="card" id="main">
+      <div class="wizard-progress">
+        <div class="wizard-status" id="step-count" data-live-translation></div>
+        <ol id="step-progress" class="wizard-segments" aria-label="Kroki konfiguratora"></ol>
+      </div>
+      <div class="wizard-scroll" id="wizard-scroll" tabindex="0" role="region" aria-label="Opcje konfiguracji">
+        <section class="panel" id="panel"></section>
+      </div>
+      <div id="wizard-actions"></div>
+    </main>
 </div>
 
-<div id="config-footer"></div>
+<footer class="config-footer"><a data-storefront href="/">BZQ Camp</a><span>Konfigurator elektryki</span></footer>
 <script type="module" src="/src/configurator/entry.jsx"></script>
 </body>
 </html>

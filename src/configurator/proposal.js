@@ -35,20 +35,20 @@ async function imageData(path) {
   });
 }
 
-export async function downloadProposal({ contact, options, equipment, tables, totals, proposalImage, warnings }) {
-  const date = new Intl.DateTimeFormat('pl-PL', { dateStyle: 'long' }).format();
+export async function downloadProposal({ contact, options, equipment, tables, totals, proposalImage, warnings, locale, translate: t }) {
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format();
   const [logo, vehicleImage] = await Promise.all([
     imageData('/media/logo.png'),
     imageData(proposalImage),
   ]);
   const document = {
-    info: { title: 'Wstępna propozycja instalacji elektrycznej', author: 'BZQ Camp' },
+    info: { title: t('Wstępna propozycja instalacji elektrycznej'), author: 'BZQ Camp' },
     pageSize: 'A4',
     pageMargins: [38, 36, 38, 42],
     defaultStyle: { fontSize: 9, color: '#24211d', lineHeight: 1.15 },
     styles: { section: { fontSize: 13, bold: true, margin: [0, 15, 0, 5] } },
     footer: (page, count) => ({
-      text: `BZQ Camp  /  ${page} z ${count}`,
+      text: `BZQ Camp  /  ${t('{0} z {1}', page, count)}`,
       alignment: 'right', margin: [38, 10, 38, 0], color: '#625a4f',
     }),
     content: [
@@ -56,39 +56,39 @@ export async function downloadProposal({ contact, options, equipment, tables, to
         table: { widths: [66, '*'], body: [[
           { image: logo, width: 52, fillColor: '#1d1b19', margin: [5, 6, 0, 5] },
           { stack: [
-            { text: 'Wstępna propozycja instalacji elektrycznej', fontSize: 18, bold: true, color: '#ffffff' },
+            { text: t('Wstępna propozycja instalacji elektrycznej'), fontSize: 18, bold: true, color: '#ffffff' },
             { text: date, color: '#ddc69b', margin: [0, 5, 0, 0] },
           ], fillColor: '#1d1b19', margin: [5, 6, 5, 5] },
         ]] },
         layout: 'noBorders',
       },
-      { text: disclaimer, margin: [0, 10, 0, 0], color: '#625a4f' },
+      { text: t(disclaimer), margin: [0, 10, 0, 0], color: '#625a4f' },
       { image: vehicleImage, fit: [460, 155], alignment: 'center', margin: [0, 12, 0, 8] },
       {
         table: { widths: ['*', '*', '*'], body: [totals.map(({ label, value }) => ({
           stack: [
             { text: value, fontSize: 20, bold: true },
-            { text: label, color: '#625a4f' },
+            { text: t(label), color: '#625a4f' },
           ],
           margin: [9, 8, 6, 8],
           fillColor: '#f0e5d1',
         }))] },
         layout: 'noBorders',
       },
-      section('Dane kontaktowe'),
-      table([['Pole', 'Wartość'], ['Imię', contact.name || '—'], ['E-mail', contact.mail || '—'],
-        ['Telefon', contact.tel || '—'], ['Uwagi', contact.msg || '—']], [125, '*']),
-      section('Założenia konfiguracji'),
-      table([['Parametr', 'Wartość'], ...options], [165, '*']),
-      section('Wybrane urządzenia'),
+      section(t('Dane kontaktowe')),
+      table([[t('Pole'), t('Wartość')], [t('Imię'), contact.name || '—'], ['E-mail', contact.mail || '—'],
+        [t('Telefon'), contact.tel || '—'], [t('Uwagi'), contact.msg || '—']], [125, '*']),
+      section(t('Założenia konfiguracji')),
+      table([[t('Parametr'), t('Wartość')], ...options], [165, '*']),
+      section(t('Wybrane urządzenia')),
       equipment.length
-        ? table([['Urządzenie', 'Zasilanie', 'Moc', 'Czas/dobę', 'Szt.'], ...equipment], ['*', 52, 48, 62, 27])
-        : { text: 'Brak wybranych urządzeń.' },
-      section('Dobór podzespołów'),
+        ? table([[t('Urządzenie'), t('Zasilanie'), t('Moc'), t('Czas/dobę'), t('Szt.')], ...equipment], ['*', 52, 48, 62, 27])
+        : { text: t('Brak wybranych urządzeń.') },
+      section(t('Dobór podzespołów')),
       table(tables[0], [58, '*', 125, 35]),
-      section('Kable i zabezpieczenia'),
+      section(t('Kable i zabezpieczenia')),
       table(tables[1], ['*', 54, 65, 110]),
-      ...(warnings.length ? [section('Uwagi do konfiguracji'), { ul: warnings }] : []),
+      ...(warnings.length ? [section(t('Uwagi do konfiguracji')), { ul: warnings }] : []),
     ],
   };
   await new Promise(resolve => {
